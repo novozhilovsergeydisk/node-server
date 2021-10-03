@@ -4,7 +4,7 @@ const fs = require('fs');
 const mimeTypes = require('./constants')
 // const static = require('./utils/index')
 
-console.log(mimeTypes)
+// console.log(mimeTypes)
 
 const hostname = '127.0.0.1';
 const port = 3000;
@@ -14,7 +14,7 @@ const server = http.createServer((req, res) => {
     // Создаем правильный путь к файлу, чтобы получить доступ к соответствующим ресурсам
     const filePath = path.join(__dirname, '/src' + req.url);
 
-    console.log('filePath=', filePath)
+    //console.log('filePath=', filePath)
 
     // file.serve(req, res);
 
@@ -46,7 +46,7 @@ const server = http.createServer((req, res) => {
         fs.exists(filePath, function (exists, err) {
             const ext = '.css';
 
-            console.log({'ext': '.css', 'mimeTypes': mimeTypes, 'exists': exists});
+            //console.log({'ext': '.css', 'mimeTypes': mimeTypes, 'exists': exists});
 
             // Если запрошенный ресурс не существует, то ответ: 404 Not Found
             if (!exists || !mimeTypes[ext]) {

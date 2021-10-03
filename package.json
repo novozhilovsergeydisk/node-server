@@ -1,0 +1,27 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/novozhilovsergeydisk/node-server.git"
+  },
+  "keywords": [],
+  "author": "Sergey Novozhilov",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/novozhilovsergeydisk/node-server/issues"
+  },
+  "homepage": "https://github.com/novozhilovsergeydisk/node-server#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.13"
+  },
+  "dependencies": {
+    "nunjucks": "^3.2.3"
+  }
+}

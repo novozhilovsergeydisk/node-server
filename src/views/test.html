@@ -1,13 +1,17 @@
 {% extends "templates/base.html" %}
 
-{% block main %}
-<h1 class="red">transplant</h1>
-<div>
-    Это {{ foo }}
-</div>
 
-{% for ingredient, amount in food %}
-Use {{ amount }} of {{ ingredient }}
-{% endfor %}
+
+{% block main %}
+<div class="container">
+    <h1 class="red">transplant</h1>
+    <div>
+        Это {{ foo }}
+    </div>
+
+    {% for ingredient, amount in food %}
+    Use {{ amount }} of {{ ingredient }}
+    {% endfor %}
+</div>
 
 {% endblock %}
