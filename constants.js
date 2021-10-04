@@ -12,4 +12,4 @@ const mimeTypes = {
     '.woff2': 'font/woff2'
 };
 
-module.exports = mimeTypes;
+exports = mimeTypes;
