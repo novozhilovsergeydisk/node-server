@@ -1,7 +1,7 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-const mimeTypes = require('../constants');
+// const mimeTypes = require('../constants');
 const mainController = require('../controllers/Main.js');
 const routes = require('../routes')
 
@@ -23,12 +23,21 @@ class Server {
                 // res.end('Resourse ' + req.url + ' not found!\n');
             } else {
                 const find = route.find(req.url, routes);
-                // console.log(find);
-            }
 
-            res.statusCode = 200;
-            res.setHeader('Content-Type', 'text/html');
-            res.end('<h3>transplant.net</h3>');
+                // mainController[route.action](response);
+
+                res.statusCode = 200;
+                res.setHeader('Content-Type', 'text/html');
+                res.end('<h3>transplant.net</h3>');
+
+                // const controller = find['route'];
+
+                // const action = find['route']['action'];
+                //
+                // mainController[action](res);
+                //
+                // console.log(find['route']['action']);
+            }
 
             //Users/sergionov/Projects/transplant.net/home/docs/Клинические_рекомендации_для_реципиента_донорского_сердца.pdf
 

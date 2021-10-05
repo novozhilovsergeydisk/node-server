@@ -5,13 +5,11 @@ class Router {
         let pattern = new RegExp('\:(.*)');
 
         for (let route in routes) {
-            // console.log({'patern': pattern, 'routes': routes, 'route.match(pattern)': route.match(pattern)});
+            console.log({'patern': pattern, 'routes': routes, 'route.match(pattern)': route.match(pattern)});
 
             if (route.match(pattern)) {
 
-                // console.log({'route': route, 'pattern': pattern});
-                //
-                // console.log({'route': route, 'path': path});
+                console.log({'route': route, 'path': path});
 
                 route = route.split('/');
                 path = path.split('/');
@@ -26,7 +24,7 @@ class Router {
 
                         if (route[i].match(pattern)) {
 
-                            console.log({'route[i].match(pattern)': route[i].match(pattern)})
+                            // console.log({'route[i].match(pattern)': route[i].match(pattern)});
 
                             parameters[route[i].match(pattern).pop()] = path[i];
 
@@ -40,13 +38,13 @@ class Router {
 
                     if (Object.keys(parameters).length) {
                         const data = {
-                            route: routes[route.join('/')],
-                            data: parameters
+                            controller: routes[route.join('/')],
+                            params: parameters
                         }
 
-                        // console.log({'parameters': parameters, 'Object.keys(parameters).length': Object.keys(parameters).length, 'data': data})
+                        console.log({'parameters': parameters, 'Object.keys(parameters).length': Object.keys(parameters).length, 'data': data})
 
-                        return
+                        return data;
                     }
                 }
             } else if (path === route) {

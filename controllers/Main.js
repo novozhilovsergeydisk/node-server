@@ -4,6 +4,10 @@ const nunjucks = require('nunjucks');
 class Main {
     constructor() {}
 
+    foo(res) {
+        console.log(__dirname);
+    }
+
     index(res) {
         console.log(__dirname);
 
