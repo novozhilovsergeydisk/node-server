@@ -22,8 +22,6 @@ class Server {
             const requireController = (name) => {
                 const controllerPath = '../controllers/' + name + '.js';
 
-                console.log(controllerPath);
-
                 return require(controllerPath);
             };
 
@@ -45,6 +43,8 @@ class Server {
                     console.log({ 'res.statusCode': res.statusCode });
 
                     mainController.not_found_404(res);
+
+                    return;
                 } else {
                     if (req.url == '/favicon.ico') {
                         // res.setHeader('Content-Type', 'text/html');
