@@ -24,11 +24,6 @@
     "action": "profile",
     "method": "GET"
   },
-  "/patient/profile": {
-    "handler": "patient",
-    "action": "profile_post",
-    "method": "POST"
-  },
   "/patient/after_pat_quest": {
     "handler": "patient",
     "action": "after_pat_quest",

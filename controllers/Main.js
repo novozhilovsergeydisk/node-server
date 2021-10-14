@@ -12,15 +12,37 @@ class Main {
         return 'index';
     }
 
-    static not_found_404(res) {
-        console.log('404 not found');
+    static internal_error_500(res) {
+        console.log({ '500': 'INTERNAL SERVER ERROR' });
 
         res.setHeader('Content-Type', 'text/html');
-        res.write('<h1>Error</h1>');
+        // res.write('<h1>Error</h1>');
+        res.write('<h3>500 INTERNAL SERVER ERROR</h3>');
+        res.end();
+
+        return '500 INTERNAL SERVER ERROR';
+    }
+
+    static bad_request_400(res) {
+        console.log({ '400': 'BAD REQUEST' });
+
+        res.setHeader('Content-Type', 'text/html');
+        // res.write('<h1>Error</h1>');
+        res.write('<h3>400 BAD REQUEST</h3>');
+        res.end();
+
+        return '400 BAD REQUEST';
+    }
+
+    static not_found_404(res) {
+        console.log({ '404': 'NOT FOUND' });
+
+        res.setHeader('Content-Type', 'text/html');
+        // res.write('<h1>Error</h1>');
         res.write('<h3>404 NOT FOUND</h3>');
         res.end();
 
-        return '404 not found';
+        return '404 NOT FOUND';
     }
 
     // test() {
