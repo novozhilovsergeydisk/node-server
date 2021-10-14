@@ -1,62 +1,98 @@
 'use strict';
 
 class Router {
-    static find(path, routes) {
-        let pattern = new RegExp('\:(.*)');
+    static findRoute(path, routes, method) {
 
-        for (let route in routes) {
-            console.log({'patern': pattern, 'routes': routes, 'route.match(pattern)': route.match(pattern)});
+        // return true;
 
-            if (route.match(pattern)) {
+        const pattern =/^\/$|^\/[a-z]+\/[a-z]+\/?$|^\/[a-z]+\/index\/?$|^\/[a-z]+\/show\/\d+$|^\/[a-z]+\/create\/?$|^\/[a-z]+\/edit\/\d+$|^\/[a-z]+\/update\/\d+$|^\/[a-z]+\/store\/?$|^\/[a-z]+\/destroy\/\d+$/g
 
-                console.log({'route': route, 'path': path});
+        // let arr = [];
+        //
+        // arr.push('/'.match(pattern));
+        // arr.push('/foo/index/'.match(pattern));
+        // arr.push('/foo/create/'.match(pattern));
+        // arr.push('/foo/show/10'.match(pattern));
+        // arr.push('/foo/edit/10'.match(pattern));
+        // arr.push('/foo/update/10'.match(pattern));
+        // arr.push('/foo/store/'.match(pattern));
+        // arr.push('/foo/destroy/10/'.match(pattern));
 
-                route = route.split('/');
-                path = path.split('/');
+        // arr.push('/'.match(pattern));
 
-                // console.log({'route': route, 'path': path});
+        // console.log({ '/patient/auth': '/patient/auth'.match(pattern) });
+        //
+        // console.log('========================================');
 
-                if (route.length === path.length) {
-                    let parameters = [];
+        // console.log({ 'typeof': typeof routes, 'Object.keys(routes)': Object.keys(routes) });
 
-                    for (let i = 0; i < route.length; i++) {
-                        // parameters[route[i]] =
-
-                        if (route[i].match(pattern)) {
-
-                            // console.log({'route[i].match(pattern)': route[i].match(pattern)});
-
-                            parameters[route[i].match(pattern).pop()] = path[i];
-
-                            // console.log({'route[i]':route[i], 'parameters': parameters, 'path[i]': path[i]})
-                        } else if (route[i] === path[i]) {
-                            continue;
-                        } else {
-                            break;
-                        }
-                    }
-
-                    if (Object.keys(parameters).length) {
-                        const data = {
-                            controller: routes[route.join('/')],
-                            params: parameters
-                        }
-
-                        console.log({'parameters': parameters, 'Object.keys(parameters).length': Object.keys(parameters).length, 'data': data})
-
-                        return data;
-                    }
-                }
-            } else if (path === route) {
-                return {
-                    route: routes[route]
-                }
-            }
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
         }
 
-        console.log('~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~');
+        let result = false;
 
-        // return false;
+        if (path.match(pattern)) {
+            console.log(path);
+            Object.keys(routes).forEach((route) => {
+                const routeArr = route.split('/');
+                const pathArr = path.split('/');
+                routeArr.shift();
+                pathArr.shift();
+                const routeLength = routeArr.length;
+                const pathLength = pathArr.length;
+                let controllerParams = {};
+                const objRoute = routes[route];
+                const lengthEqual = routeLength === pathLength;
+                const methodEqual = objRoute.method === method;
+
+                // console.log(lengthEqual && methodEqual);
+
+                if (lengthEqual && methodEqual) {
+
+                    // console.log({ 'route': route, 'objRoute': objRoute, 'methodRoute': objRoute.method, 'method': method });
+
+                    controllerParams['HTTP_METHOD'] = method;
+
+                    // console.log({ 'route': route, 'objRoute': objRoute, 'methodRoute': objRoute.method, 'method': method });
+
+                    if (pathLength === 1) {
+                        controllerParams['controllerName'] = 'Main';
+                        controllerParams['methodName'] = 'main';
+                        controllerParams['paramName'] = controllerParams['paramValue'] = null;
+
+                        result = controllerParams;
+                    } else {
+                        if (routeArr[0] === pathArr[0] && routeArr[1] === pathArr[1]) {
+                            controllerParams = {
+                                name: capitalizeFirstLetter(pathArr[0]),
+                                methodName: pathArr[1],
+                            }
+
+                            if (routeLength > 2) {
+                                controllerParams['paramName'] = routeArr[2].substring(1);
+                                controllerParams['paramValue'] = pathArr[2];
+                            } else {
+                                controllerParams['paramName'] = controllerParams['paramValue'] = '';
+                            }
+
+                            // console.log({ 'controllerParams': controllerParams });
+
+                            result = controllerParams;
+                        }
+                    }
+                }
+
+                // console.log({ 'pathArr': pathArr, 'routeArr': routeArr, 'route': route, 'settings': routes[route] });
+            });
+        } else {
+
+            // return result;
+        }
+
+        // console.log('========================================');
+
+        return result;
     }
 }
 

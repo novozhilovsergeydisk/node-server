@@ -2,8 +2,13 @@ const http = require('http');
 const path = require('path');
 const fs = require('fs');
 // const mimeTypes = require('../constants');
-const mainController = require('../controllers/Main.js');
-const routes = require('../routes')
+
+const cName = 'Main';
+const mainController = require('../controllers/' + cName + '.js');
+
+const routes = require('../routes');
+
+// console.log({ 'mainController': mainController });
 
 class Server {
     start(port, host, route) {
@@ -12,31 +17,98 @@ class Server {
 
     createServer(port, host, route) {
         const server = http.createServer((req, res) => {
+            let findRoute = '';
 
-            // Создаем правильный путь к файлу, чтобы получить доступ к соответствующим ресурсам
-            const filePath = path.join(__dirname, '/src' + req.url);
+            const requireController = (name) => {
+                const controllerPath = '../controllers/' + name + '.js';
 
-            // console.log({'req.url': req.url});
+                console.log(controllerPath);
 
-            if (req.url == '/favicon.ico') {
-                // res.setHeader('Content-Type', 'text/html');
-                // res.end('Resourse ' + req.url + ' not found!\n');
-            } else {
-                const find = route.find(req.url, routes);
+                return require(controllerPath);
+            };
 
-                // mainController[route.action](response);
+            // console.log({ 'url': req.url, 'method': req.method });
 
+            if (req.method == 'PUT') {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'text/html');
+                res.write('<h1>Handler PUT</h1>');
                 res.end('<h3>transplant.net</h3>');
+            }
 
-                // const controller = find['route'];
+            if (req.method == 'GET') {
+                findRoute = route.findRoute(req.url, routes, req.method);
 
-                // const action = find['route']['action'];
+                console.log({ 'findRoute': findRoute });
+
+                if (!findRoute) {
+                    console.log({ 'res.statusCode': res.statusCode });
+
+                    mainController.not_found_404(res);
+                } else {
+                    if (req.url == '/favicon.ico') {
+                        // res.setHeader('Content-Type', 'text/html');
+                        // res.end('Resourse ' + req.url + ' not found!\n');
+                    } else {
+                        // const find = route.find(req.url, routes, req.method);
+
+                        // mainController[route.action](response);
+
+                        res.statusCode = 200;
+                        res.setHeader('Content-Type', 'text/html');
+                        res.write('<h1>Method GET</h1>');
+                        res.end('<h3>transplant.net</h3>');
+
+                        // const controller = find['route'];
+
+                        // const action = find['route']['action'];
+                        //
+                        // mainController[action](res);
+                        //
+                        // console.log(find['route']['action']);
+                    }
+                }
+            }
+
+            if (req.method == 'POST') {
+                findRoute = route.findRoute(req.url, routes, req.method);
+                console.log({ 'findRoute': findRoute });
+
+                if (!findRoute) {
+                    console.log(res.statusCode);
+
+                    // res.statusCode = 404;
+                    res.setHeader('Content-Type', 'text/html');
+                    res.write('<h1>Error</h1>');
+                    res.write('<h3>404 NOT FOUND</h3>h3>');
+                    res.end();
+                } else {
+
+                }
+
+                // const controllerName = findRoute.name;
+                // const controllerMethod = findRoute.methodName;
+
+                // const controllerClass = requireController(controllerName);
+                // const controller = new controllerClass();
+                // console.log(controller[controllerMethod]());
+
+                // let body = '';
                 //
-                // mainController[action](res);
+                // req.on('data', function(chunk) {
+                //     body += chunk.toString();
+                // });
                 //
-                // console.log(find['route']['action']);
+                // req.on('end', function() {
+                //     res.statusCode = 200;
+                //     res.setHeader('Content-Type', 'text/html');
+                //     res.write('END');
+                //     res.end();
+                // });
+
+                // res.statusCode = 200;
+                // res.setHeader('Content-Type', 'text/html');
+                // res.end('<h3>Method POST</h3>');
             }
 
             //Users/sergionov/Projects/transplant.net/home/docs/Клинические_рекомендации_для_реципиента_донорского_сердца.pdf
