@@ -1,11 +1,14 @@
 'use strict';
 
 class Router {
-    static findRoute(path, routes, method) {
+    static findRoute(path, routes, http_method) {
 
         // return true;
 
-        const pattern =/^\/$|^\/[a-z]+\/[a-z]+\/?$|^\/[a-z]+\/index\/?$|^\/[a-z]+\/show\/\d+$|^\/[a-z]+\/create\/?$|^\/[a-z]+\/edit\/\d+$|^\/[a-z]+\/update\/\d+$|^\/[a-z]+\/store\/?$|^\/[a-z]+\/destroy\/\d+$/g
+        /*const pattern =/^\/$|^\/[a-z]+\/[a-z]+\/?$|^\/[a-z]+\/index\/?$|^\/[a-z]+\/show\/\d+$|^\/[a-z]+\/create\/?$|^\/[a-z]+\/edit\/\d+$|^\/[a-z]+\/update\/\d+$|^\/[a-z]+\/store\/?$|^\/[a-z]+\/destroy\/\d+$/g*/
+
+
+        const pattern =/^\/$|^\/[a-z_]+\/[a-z_]+\/?$|^\/$|^\/[a-z_]+\/[a-z_]+\/\d+$/g
 
         // let arr = [];
         //
@@ -33,64 +36,32 @@ class Router {
         let result = false;
 
         if (path.match(pattern)) {
-            console.log(path);
-            Object.keys(routes).forEach((route) => {
-                const routeArr = route.split('/');
-                const pathArr = path.split('/');
-                routeArr.shift();
-                pathArr.shift();
-                const routeLength = routeArr.length;
-                const pathLength = pathArr.length;
-                let controllerParams = {};
-                const objRoute = routes[route];
-                const lengthEqual = routeLength === pathLength;
-                const methodEqual = objRoute.method === method;
+            // console.log({ 'path': path, 'routes': routes.get });
 
-                // console.log(lengthEqual && methodEqual);
+            // console.log(routes.get);
 
-                if (lengthEqual && methodEqual) {
+            if (http_method === 'GET') {
+                Object.keys(routes.get).forEach((route) => {
+                    if (path === route) {
+                        // console.log({ 'path': path, 'handler': routes.get[route].handler });
+                        // console.log({ 'route': route, 'action': routes.get[route].action });
 
-                    // console.log({ 'route': route, 'objRoute': objRoute, 'methodRoute': objRoute.method, 'method': method });
-
-                    controllerParams['HTTP_METHOD'] = method;
-
-                    // console.log({ 'route': route, 'objRoute': objRoute, 'methodRoute': objRoute.method, 'method': method });
-
-                    if (pathLength === 1) {
-                        controllerParams['controllerName'] = 'Main';
-                        controllerParams['methodName'] = 'main';
-                        controllerParams['paramName'] = controllerParams['paramValue'] = null;
-
-                        result = controllerParams;
-                    } else {
-                        if (routeArr[0] === pathArr[0] && routeArr[1] === pathArr[1]) {
-                            controllerParams = {
-                                name: capitalizeFirstLetter(pathArr[0]),
-                                methodName: pathArr[1],
-                            }
-
-                            if (routeLength > 2) {
-                                controllerParams['paramName'] = routeArr[2].substring(1);
-                                controllerParams['paramValue'] = pathArr[2];
-                            } else {
-                                controllerParams['paramName'] = controllerParams['paramValue'] = '';
-                            }
-
-                            // console.log({ 'controllerParams': controllerParams });
-
-                            result = controllerParams;
-                        }
+                        result = {'handler': routes.get[route].handler, 'action': routes.get[route].action};
                     }
-                }
+                });
+            }
 
-                // console.log({ 'pathArr': pathArr, 'routeArr': routeArr, 'route': route, 'settings': routes[route] });
-            });
-        } else {
+            if (http_method === 'POST') {
+                Object.keys(routes.post).forEach((route) => {
+                    if (path === route) {
+                        // console.log({ 'path': path, 'handler': routes.post[route].handler });
+                        // console.log({ 'route': route, 'action': routes.post[route].action });
 
-            // return result;
+                        result = {'handler': routes.post[route].handler, 'action': routes.post[route].action};
+                    }
+                });
+            }
         }
-
-        // console.log('========================================');
 
         return result;
     }

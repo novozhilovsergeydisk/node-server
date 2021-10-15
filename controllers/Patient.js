@@ -35,9 +35,9 @@ class Patient {
     }
 
     pat_email_edit() {
-        console.log('Отправка email');
+        console.log('Отправка email пациенту');
 
-        return 'store';
+        return 'pat_email_edit';
     }
 
     auth() {

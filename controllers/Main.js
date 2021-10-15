@@ -12,6 +12,14 @@ class Main {
         return 'index';
     }
 
+    static success(res, body) {
+        res.setHeader('Content-Type', 'text/html');
+        res.write(body);
+        res.end();
+
+        return '404 NOT FOUND';
+    }
+
     static internal_error_500(res) {
         console.log({ '500': 'INTERNAL SERVER ERROR' });
 

@@ -1,47 +1,52 @@
 {
-  "/": {
-    "handler": "Main",
-    "action": "main",
-    "method": "GET"
+  "get": {
+    "/": {
+      "handler": "main",
+      "action": "index"
+    },
+    "/patient/section": {
+      "handler": "patient",
+      "action": "section"
+    },
+    "/patient/quest_edit_patients": {
+      "handler": "patient",
+      "action": "quest_edit_patients"
+    },
+    "/patient/docquest": {
+      "handler": "patient",
+      "action": "docquest"
+    },
+    "/patient/profile": {
+      "handler": "patient",
+      "action": "profile"
+    },
+    "/patient/after_pat_quest": {
+      "handler": "patient",
+      "action": "after_pat_quest"
+    },
+    "/patient/pat_email_edit": {
+      "handler": "patient",
+      "action": "pat_email_edit"
+    },
+    "/patient/auth": {
+      "handler": "patient",
+      "action": "auth"
+    }
   },
-  "/patient/section": {
-    "handler": "patient",
-    "action": "section",
-    "method": "GET"
+  "post": {
+    "/patient/pat_email_edit": {
+      "handler": "patient",
+      "action": "pat_email_edit"
+    }
   },
-  "/patient/quest_edit_patients": {
-    "handler": "patient",
-    "action": "quest_edit_patients",
-    "method": "GET"
-  },
-  "/patient/docquest": {
-    "handler": "patient",
-    "action": "docquest",
-    "method": "GET"
-  },
-  "/patient/profile": {
-    "handler": "patient",
-    "action": "profile",
-    "method": "GET"
-  },
-  "/patient/after_pat_quest": {
-    "handler": "patient",
-    "action": "after_pat_quest",
-    "method": "GET"
-  },
-  "/patient/pat_email_edit": {
-    "handler": "patient",
-    "action": "pat_email_edit",
-    "method": "GET"
-  },
-  "/patient/pat_email_edit": {
-    "handler": "patient",
-    "action": "pat_email_edit",
-    "method": "POST"
-  },
-  "/patient/auth": {
-    "handler": "patient",
-    "action": "auth",
-    "method": "GET"
-  }
+  "put": {},
+  "delete": {}
 }
+
+
+
+
+
+
+
+
