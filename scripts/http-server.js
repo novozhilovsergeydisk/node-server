@@ -1,14 +1,16 @@
 const http = require('http');
 const path = require('path');
 const fs = require('fs');
-// const mimeTypes = require('../constants');
-
+const { mimeTypes } = require('../constants.js');
+const { appPath } = require('../constants.js');
 const cName = 'Main';
 const mainController = require('../controllers/' + cName + '.js');
+const routes = require('../routes.json');
+const capitalizeFirstLetter = require('./capitalize-first-letter');
+const logger = require("../../node_modules/webpack-cli/lib/utils/logger.js");
+const mime = require('mime');
 
-const routes = require('../routes');
-
-// console.log({ 'mainController': mainController });
+console.log({ 'appPath': appPath });
 
 class Server {
     start(port, host, route) {
@@ -16,39 +18,128 @@ class Server {
     }
 
     createServer(port, host, route) {
+
+        // console.log({ 'route.__proto__': route.__proto__, 'route.prototype': route.prototype });
+
         const server = http.createServer((req, res) => {
             const requireController = (name) => {
-                return require('../controllers/' + name + '.js');
+                const controller_path = '../controllers/' + capitalizeFirstLetter(name) + '.js';
+                // console.log({ 'controller_path': controller_path });
+
+                return require(controller_path);
             };
 
             const spread = (...args) => {
 
+                // console.log(args.length);
+                //
+                // args.forEach(item => {
+                //     console.log(item);
+                // });
+
                 return args;
             }
 
-            console.log({ 'test': spread({'up': 'down'}, 'foo', 'bar') });
+            // res.prototype = spread;
+
+            // console.log({ 'test': spread({'up': 'down'}, 'foo', 'bar') });
 
             const run = ((res, handler, action, params=null) => {
-                const controllerName = handler;
-                const controllerMethod = action;
+                try {
 
-                const controllerClass = requireController(controllerName);
-                const controller = new controllerClass();
+                    // console.log({ 'handler': handler });
 
-                controller[controllerMethod](params);
+                    const controllerName = handler;
+                    const controllerMethod = action;
 
-                res.setHeader('Content-Type', 'text/html');
-                res.write('Status: ' + res.statusCode) + ' OK';
-                res.end();
+                    // console.log({ 'controllerName': controllerName });
 
-                return 'run success';
+                    const controllerClass = requireController(controllerName);
+
+                    // console.log({ 'controllerClass': controllerClass });
+
+                    const controller = new controllerClass();
+
+                    // console.log(controller);
+
+                    controller[controllerMethod](res);
+
+                    // console.log({ 'readStream': readStream });
+
+
+
+                    //res.setHeader('Content-Type', 'text/html');
+
+                    // if (readStream) {
+                    //     readStream.pipe(res);
+                    // } else {
+                    //     res.write('Status: ' + res.statusCode) + 'No render';
+                    // }
+
+                    //res.write('Status: ' + res.statusCode) + ' OK';
+
+                    //res.end();
+
+                    return 'run success';
+                } catch(err) {
+                    console.log({ 'err': err });
+                    return 'run error';
+                }
             });
 
             let findRoute = route.findRoute(req.url, routes, req.method);
-            console.log({ 'findRoute': findRoute });
+            // console.log({ 'findRoute': findRoute });
 
             if (req.method == 'GET') {
-                !findRoute ? mainController.not_found_404(res) : mainController.success(res, 'get success');
+
+                // console.log({ 'res.prototype': res.prototype });
+
+                // if (req.url === '/css/style.css') {
+                if (/\.(css)$/.test(req.url)) {
+                    const cssPath = appPath + '/src' + req.url;
+
+                    console.log({ 'mime.lookup(req.url)': mime.lookup(req.url) });
+
+                    const readStream = fs.createReadStream(cssPath, 'utf8');
+
+                    // console.log({ 'readStream': readStream });
+
+                    // if (readStream) {
+                    //     res.setHeader("Content-Type", 'text/css');
+                    //     readStream.pipe(res);
+                    //     res.end();
+                    //     return 'success css';
+                    // }
+
+                    fs.readFile(cssPath, function(err, data) {
+                        if (err) {
+                            res.writeHead(404);
+                            return res.end("File not found.");
+                        } else {
+                            console.log({ 'data': data });
+
+                            res.writeHead(200, {'Content-Type': 'text/css'});
+                            res.write(fs.readFileSync(cssPath, 'utf8'));
+                            res.end();
+                        }
+                    });
+
+                    return;
+                }
+
+                if (req.url === '/css/style.css') {
+                    res.setHeader('Content-Type', 'text/css');
+                    res.end('css');
+                    return;
+                }
+
+                console.log({ 'req.url': req.url });
+
+                if (!findRoute) {
+                    mainController.not_found_404(res);
+                } else {
+                    run(res, findRoute.handler, findRoute.action);
+                }
             }
 
             if (req.method == 'POST') {
@@ -73,20 +164,14 @@ class Server {
 
 
             req.on('end', function() {
-                console.log('req.on: end | req.method = ' + req.method);
+                // logger.info(logger);
+                // console.log('req.on: end | req.method = ' + req.method);
             });
         });
 
-        server.on('request', function(request, response) {
-            console.log('server request');
-
-            // response.writeHead(200);
-            // console.log(request.method);
-            // console.log(request.headers);
-            // console.log(request.url);
-            // response.write('hi');
-            // response.end();
-        });
+        // server.on('request', function(request, response) {
+        //     console.log('server request');
+        // });
 
         server.listen(port, host, () => {
             console.log(`Server running at http://${host}:${port}/`);

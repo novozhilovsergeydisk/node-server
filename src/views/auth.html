@@ -1,10 +1,17 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends "templates/base.html" %}
 
-</body>
-</html>
+{% block title %}transplant.net{% endblock %}
+
+{% block main %}
+<div class="container">
+    <h1 class="green">transplant</h1>
+    <div>
+        Пациент: {{ patient }}
+    </div>
+
+    {% for ingredient, amount in food %}
+    Use {{ amount }} of {{ ingredient }}
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,3 +1,5 @@
+const path = require('path');
+
 const mimeTypes = {
     '.html': 'text/html',
     '.js': 'text/javascript',
@@ -12,4 +14,11 @@ const mimeTypes = {
     '.woff2': 'font/woff2'
 };
 
-exports = mimeTypes;
+const appPath = path.resolve(__dirname);
+
+const CONSTANTS = {
+    mimeTypes: mimeTypes,
+    appPath: appPath
+}
+
+module.exports = CONSTANTS;

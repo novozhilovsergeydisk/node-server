@@ -13,15 +13,6 @@ class Router {
         // let arr = [];
         //
         // arr.push('/'.match(pattern));
-        // arr.push('/foo/index/'.match(pattern));
-        // arr.push('/foo/create/'.match(pattern));
-        // arr.push('/foo/show/10'.match(pattern));
-        // arr.push('/foo/edit/10'.match(pattern));
-        // arr.push('/foo/update/10'.match(pattern));
-        // arr.push('/foo/store/'.match(pattern));
-        // arr.push('/foo/destroy/10/'.match(pattern));
-
-        // arr.push('/'.match(pattern));
 
         // console.log({ '/patient/auth': '/patient/auth'.match(pattern) });
         //
@@ -29,9 +20,9 @@ class Router {
 
         // console.log({ 'typeof': typeof routes, 'Object.keys(routes)': Object.keys(routes) });
 
-        function capitalizeFirstLetter(string) {
-            return string.charAt(0).toUpperCase() + string.slice(1);
-        }
+        // Router.prototype.capitalizeFirstLetter = ((string) => {
+        //     return string.charAt(0).toUpperCase() + string.slice(1);
+        // });
 
         let result = false;
 
@@ -42,7 +33,9 @@ class Router {
 
             if (http_method === 'GET') {
                 Object.keys(routes.get).forEach((route) => {
-                    if (path === route) {
+                    // console.log({ 'path': path, 'route': route + '/' });
+
+                    if (path === route || path === route + '/') {
                         // console.log({ 'path': path, 'handler': routes.get[route].handler });
                         // console.log({ 'route': route, 'action': routes.get[route].action });
 
@@ -53,7 +46,7 @@ class Router {
 
             if (http_method === 'POST') {
                 Object.keys(routes.post).forEach((route) => {
-                    if (path === route) {
+                    if (path === route || path === route + '/') {
                         // console.log({ 'path': path, 'handler': routes.post[route].handler });
                         // console.log({ 'route': route, 'action': routes.post[route].action });
 
