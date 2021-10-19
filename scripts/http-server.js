@@ -10,7 +10,7 @@ const capitalizeFirstLetter = require('./capitalize-first-letter');
 const logger = require("../../node_modules/webpack-cli/lib/utils/logger.js");
 const mime = require('mime');
 
-console.log({ 'appPath': appPath });
+// console.log({ 'appPath': appPath });
 
 class Server {
     start(port, host, route) {
@@ -87,20 +87,51 @@ class Server {
                 }
             });
 
-            let findRoute = route.findRoute(req.url, routes, req.method);
+            let findRoute = route.findRoute(req, routes);
             // console.log({ 'findRoute': findRoute });
 
             if (req.method == 'GET') {
 
                 // console.log({ 'res.prototype': res.prototype });
 
-                // if (req.url === '/css/style.css') {
-                if (/\.(css)$/.test(req.url)) {
+                console.log({ 'req.url': req.url });
+
+                if (/^\/img\/[a-z_]+\.((png)|(jpg)|(ico)|(gif)|(svg))$/.test(req.url)) {
+                    const imagePath = appPath + '/src' + req.url;
+                    const mimeType = mime.lookup(req.url);
+
+                    console.log({ 'mimeType': mimeType });
+
+                    fs.readFile(imagePath, (err, data) => {
+                        if (err) {
+                            res.writeHead(404);
+                            return res.end("File not found.");
+                        } else {
+                            // console.log({ 'data': data });
+
+                            let img = fs.readFileSync(imagePath);
+                            res.writeHead(200, {'Content-Type': 'image/png' });
+                            res.end(img, 'binary');
+
+                            // res.writeHead(200, {'Content-Type': mimeType});
+                            // res.write(fs.readFileSync(imagePath, 'utf8'));
+                            // res.end(imagePath, 'binary');
+                        }
+                    });
+
+                    // res.writeHead(200, {'Content-Type': 'text/css'});
+                    // res.write(imagePath);
+                    // res.end();
+
+                    return;
+                }
+
+                if (/^\/css\/[a-z_]+\.css$/.test(req.url)) {
                     const cssPath = appPath + '/src' + req.url;
 
                     console.log({ 'mime.lookup(req.url)': mime.lookup(req.url) });
 
-                    const readStream = fs.createReadStream(cssPath, 'utf8');
+                    // const readStream = fs.createReadStream(cssPath, 'utf8');
 
                     // console.log({ 'readStream': readStream });
 
@@ -116,7 +147,7 @@ class Server {
                             res.writeHead(404);
                             return res.end("File not found.");
                         } else {
-                            console.log({ 'data': data });
+                            // console.log({ 'data': data });
 
                             res.writeHead(200, {'Content-Type': 'text/css'});
                             res.write(fs.readFileSync(cssPath, 'utf8'));
@@ -127,13 +158,13 @@ class Server {
                     return;
                 }
 
-                if (req.url === '/css/style.css') {
-                    res.setHeader('Content-Type', 'text/css');
-                    res.end('css');
-                    return;
-                }
+                // if (req.url === '/css/style.css') {
+                //     res.setHeader('Content-Type', 'text/css');
+                //     res.end('css');
+                //     return;
+                // }
 
-                console.log({ 'req.url': req.url });
+                // console.log({ 'req.url': req.url });
 
                 if (!findRoute) {
                     mainController.not_found_404(res);

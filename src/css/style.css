@@ -1,3 +1,11 @@
+body {
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
+
+a {
+    text-decoration: none;
+}
+
 .container  {
     margin: 15px;
     /*border: 1px solid red;*/
@@ -9,4 +17,61 @@
 
 .green {
     color: green;
+}
+
+.btn-common {
+    color: #FFFFFF;
+    background: #1594b7;
+    border-color: #1594b7;
+}
+
+.btn {
+    display: block;
+    padding: 6px 12px;
+    margin: 5px;
+    font-size: 14px;
+    font-weight: normal;
+    text-align: center;
+    white-space: nowrap;
+    vertical-align: middle;
+    cursor: pointer;
+    background-image: none;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    width: 160px;
+}
+
+.btn-default {
+    color: #333333;
+    background-color: #ffffff;
+    border-color: #d9d9d9;
+}
+.btn-common {
+    color: #FFFFFF;
+    background: #1594b7;
+    border-color: #1594b7;
+}
+.btn-common:hover {
+    color: #FFFFFF;
+    background: #1381a0;
+    border-color: #1381a0;
+}
+.btn-common:active {
+    background-color: #106f89;
+    border-color: #106f89;
+}
+.btn-default:hover {
+    background-color: #f2f2f2;
+    border-color: #c1e2b3;
+}
+.btn-default:active, .btn-default.active, .open > .dropdown-toggle.btn-default {
+    color: #333333;
+    background-image: none;
+    background-color: #f3f3f3;
+    border-color: #adadad;
+}
+
+.input {
+    display: block;
+    margin: 5px;
 }

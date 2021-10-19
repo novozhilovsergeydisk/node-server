@@ -1,17 +1,68 @@
 {% extends "templates/base.html" %}
 
-{% block title %}transplant.net{% endblock %}
+{% block title %}Форма авторизации{% endblock %}
 
 {% block main %}
 <div class="container">
-    <h1 class="green">transplant</h1>
-    <div>
-        Пациент: {{ patient }}
+    <div class="header-block">
+        <a href="/"><img src="/img/logo.png" id="logo-pic"></a>
     </div>
 
-    {% for ingredient, amount in food %}
-    Use {{ amount }} of {{ ingredient }}
-    {% endfor %}
+    <h1 class="">Вход в трансплант.net</h1>
+
+    <!--<div>-->
+        <!--Пациент: {{ patient }}-->
+    <!--</div>-->
+
+    <style>
+        .form-control {
+            display: block;
+            width: 100%;
+            height: 34px;
+            padding: 6px 12px;
+            font-size: 14px;
+            line-height: 1.42857143;
+            color: #555;
+            background-color: #fff;
+            background-image: none;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+            box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+            -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+            -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+        }
+    </style>
+
+    <form>
+        <input id="csrf_token" type="hidden" name="csrf_token" value="a2b2332f554e11597b128a133d767b8ca431796bc0bdb84887944f940e127c22">
+
+        <p id="error" class="error display-none"></p>
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" class="form-control display-block" id="email" placeholder="ваш email" name="email">
+        </div>
+        <div class="form-group">
+            <label for="pass">Пароль:</label>
+            <div class="input-append input-group">
+                <input type="password" class="form-control" id="pass" placeholder="ваш пароль" name="pass" data-toggle="password">
+                <input type="text" class="form-control" placeholder="ваш пароль" style="display: none;"><span tabindex="100" title="показать/скрыть пароль" class="add-on input-group-addon" style="cursor: pointer;">
+                <i class="icon-eye-open glyphicon glyphicon-eye-open"></i></span>
+            </div>
+        </div>
+        <div class="checkbox">
+            <label><input type="checkbox" name="save" id="save" checked="checked"> Запомнить меня</label>
+        </div>
+
+        <!--<button type="submit" class="btn btn-primary" style="width:160px" onclick="login();return false">вход</button>-->
+
+        <a href="/doc/quest/156" class="btn btn-common display-block">Войти</a>
+
+        <div style="float:right;margin-top:16px"><a href="/usr/pass/form">не помню пароль</a></div>
+
+    </form>
+
 </div>
 
 {% endblock %}

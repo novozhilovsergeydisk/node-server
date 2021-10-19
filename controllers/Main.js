@@ -43,10 +43,11 @@ class Main {
     }
 
     static not_found_404(res) {
-        console.log({ '404': 'NOT FOUND' });
+        console.log({ '404': 'NOT FOUND', 'res.url': res.url });
 
         res.setHeader('Content-Type', 'text/html');
         // res.write('<h1>Error</h1>');
+        res.write('<h1>'+res.url+'</h1>');
         res.write('<h3>404 NOT FOUND</h3>');
         res.end();
 

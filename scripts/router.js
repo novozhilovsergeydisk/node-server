@@ -1,7 +1,9 @@
 'use strict';
 
 class Router {
-    static findRoute(path, routes, http_method) {
+    static findRoute(req, routes) {
+        const path = req.url;
+        const http_method = req.method;
 
         // return true;
 
