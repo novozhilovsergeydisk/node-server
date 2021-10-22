@@ -1,25 +1,24 @@
-const nunjucks = require('nunjucks');
-const { appPath } = require('../constants');
+const Base = require('./Base.js');
 
-class Auth {
-    constructor(data) {
-        this.data = data;
+class Auth extends Base {
+    constructor(res) {
+        super(res);
     }
 
-    index(res) {
+    index() {
         try {
-            nunjucks.configure(appPath + '/src/views', { autoescape: true });
+            this.nunjucks.configure(this.constants.appPath + '/src/views', { autoescape: true });
 
             const data = {
                 'name': 'Лозап+',
                 'dose': '1 таблетка'
             };
 
-            const render = nunjucks.render('auth.html', { patient: 'Иванов', doctor: 'Новожилов' });
+            const render = this.nunjucks.render('auth.html', { patient: 'Иванов', doctor: 'Новожилов' });
 
-            res.setHeader('Content-Type', 'text/html');
-            res.write(render);
-            res.end();
+            this.res.setHeader('Content-Type', 'text/html');
+            this.res.write(render);
+            this.res.end();
         } catch(err) {
             console.log({'err': err});
         }

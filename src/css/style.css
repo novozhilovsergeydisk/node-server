@@ -1,34 +1,49 @@
-body {
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+:root {
+    --common: #0d5c71;
+    --common-rgb: 13, 92, 113;
+    --blue-rgb: 107, 179, 214;
+    --orange: #eb9316;
+    --color-555: #555555;
+    --color-ccc: #cccccc;
+    --color-666: #666666;
+    --color-grey: #A1A1A1;
 }
 
+@charset "utf-8";
+
+body {
+    background-color: #f7faf5;  /*f3f8f0*/
+    color: #1c513b;
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+}
 a {
     text-decoration: none;
 }
-
 .container  {
     margin: 15px;
+    display: flex;
+    /*align-items: center;*/
+    justify-content: center;
+
     /*border: 1px solid red;*/
 }
-
+.color-common {
+    color: var(--common);
+}
 .red {
     color: red;
 }
-
 .green {
     color: green;
 }
-
 .btn-common {
     color: #FFFFFF;
     background: #1594b7;
     border-color: #1594b7;
 }
-
 .btn {
     display: block;
     padding: 6px 12px;
-    margin: 5px;
     font-size: 14px;
     font-weight: normal;
     text-align: center;
@@ -38,9 +53,7 @@ a {
     background-image: none;
     border: 1px solid transparent;
     border-radius: 4px;
-    width: 160px;
 }
-
 .btn-default {
     color: #333333;
     background-color: #ffffff;
@@ -70,8 +83,33 @@ a {
     background-color: #f3f3f3;
     border-color: #adadad;
 }
-
-.input {
-    display: block;
+input {outline: none;}
+.form-control {
+    height: 32px;
+    padding: 5px 10px;
+    line-height: 1.4;
+    color: #555;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+.form-control:hover {
+    border-color: #A7A5A5;
+}
+.form-control:focus {
+    box-shadow: 0 0 10px 5px rgba(221, 221, 221, 1);
+    border-color: #969696;
+}
+.header, .section, .footer {
     margin: 5px;
+}
+.form-group {
+    margin-top: 10px;
+}
+#password-control {
+    cursor: pointer;
 }

@@ -9,6 +9,34 @@ const routes = require('../routes.json');
 const capitalizeFirstLetter = require('./capitalize-first-letter');
 const logger = require("../../node_modules/webpack-cli/lib/utils/logger.js");
 const mime = require('mime');
+const { createHmac } = require('crypto');
+const promise = import('events');
+
+// ex -------------
+console.log('\x1Bc');
+const buffer = fs.readFileSync('./server.js', 'utf8');
+const src = buffer.toString();
+const lines = src.split('\n').filter(line => !!line);
+const str = lines.join('\n');
+
+fs.writeFileSync('1-test.txt', str);
+
+console.log({ 'buffer': buffer, 'src': src, 'lines': lines, 'str': str });
+// END ex -------------
+
+
+// const secret = 'abcdefg';
+// const hash = createHmac('sha256', secret)
+//     .update('I love cupcakes')
+//     .digest('hex');
+//
+// console.log(hash);
+//
+// const constantsPath = require.resolve('../constants.js');
+//
+// console.log({ 'constantsPath': constantsPath });
+
+// console.log({ 'require.cache': require.cache });
 
 // console.log({ 'appPath': appPath });
 
@@ -44,11 +72,8 @@ class Server {
 
             // console.log({ 'test': spread({'up': 'down'}, 'foo', 'bar') });
 
-            const run = ((res, handler, action, params=null) => {
+            const runControllerMethod = ((res, handler, action, params=null) => {
                 try {
-
-                    // console.log({ 'handler': handler });
-
                     const controllerName = handler;
                     const controllerMethod = action;
 
@@ -58,49 +83,30 @@ class Server {
 
                     // console.log({ 'controllerClass': controllerClass });
 
-                    const controller = new controllerClass();
+                    const controller = new controllerClass(res);
 
                     // console.log(controller);
 
-                    controller[controllerMethod](res);
+                    controller[controllerMethod](params);
 
-                    // console.log({ 'readStream': readStream });
+                    // console.log({ 'controllerMethod': controllerMethod });
 
-
-
-                    //res.setHeader('Content-Type', 'text/html');
-
-                    // if (readStream) {
-                    //     readStream.pipe(res);
-                    // } else {
-                    //     res.write('Status: ' + res.statusCode) + 'No render';
-                    // }
-
-                    //res.write('Status: ' + res.statusCode) + ' OK';
-
-                    //res.end();
-
-                    return 'run success';
+                    return 'success';
                 } catch(err) {
                     console.log({ 'err': err });
-                    return 'run error';
+                    return 'error';
                 }
             });
 
             let findRoute = route.findRoute(req, routes);
-            // console.log({ 'findRoute': findRoute });
 
             if (req.method == 'GET') {
-
-                // console.log({ 'res.prototype': res.prototype });
-
-                console.log({ 'req.url': req.url });
 
                 if (/^\/img\/[a-z_]+\.((png)|(jpg)|(ico)|(gif)|(svg))$/.test(req.url)) {
                     const imagePath = appPath + '/src' + req.url;
                     const mimeType = mime.lookup(req.url);
 
-                    console.log({ 'mimeType': mimeType });
+                    // console.log({ 'mimeType': mimeType });
 
                     fs.readFile(imagePath, (err, data) => {
                         if (err) {
@@ -129,7 +135,7 @@ class Server {
                 if (/^\/css\/[a-z_]+\.css$/.test(req.url)) {
                     const cssPath = appPath + '/src' + req.url;
 
-                    console.log({ 'mime.lookup(req.url)': mime.lookup(req.url) });
+                    // console.log({ 'mime.lookup(req.url)': mime.lookup(req.url) });
 
                     // const readStream = fs.createReadStream(cssPath, 'utf8');
 
@@ -158,19 +164,13 @@ class Server {
                     return;
                 }
 
-                // if (req.url === '/css/style.css') {
-                //     res.setHeader('Content-Type', 'text/css');
-                //     res.end('css');
-                //     return;
-                // }
-
-                // console.log({ 'req.url': req.url });
-
                 if (!findRoute) {
                     mainController.not_found_404(res);
                 } else {
-                    run(res, findRoute.handler, findRoute.action);
+                    runControllerMethod(res, findRoute.handler, findRoute.action);
                 }
+
+                return;
             }
 
             if (req.method == 'POST') {
@@ -183,9 +183,9 @@ class Server {
                         body += chunk.toString();
                     });
 
-                    run(res, findRoute.handler, findRoute.action, body);
+                    // console.log({ 'body': body })
 
-                    // mainController.success(res, 'post success');
+                    runControllerMethod(res, findRoute.handler, findRoute.action, body);
                 }
             }
 
@@ -193,10 +193,8 @@ class Server {
                 mainController.success(res, 'put');
             }
 
-
             req.on('end', function() {
-                // logger.info(logger);
-                // console.log('req.on: end | req.method = ' + req.method);
+                // logger.info('end');
             });
         });
 
@@ -209,5 +207,4 @@ class Server {
         });
     }
 }
-
 module.exports = new Server();

@@ -3,66 +3,195 @@
 {% block title %}Форма авторизации{% endblock %}
 
 {% block main %}
-<div class="container">
-    <div class="header-block">
-        <a href="/"><img src="/img/logo.png" id="logo-pic"></a>
-    </div>
 
-    <h1 class="">Вход в трансплант.net</h1>
+<style>
+    #flex-container {
+        display: -webkit-flex;
+        display: flex;
+        -webkit-flex-direction: row;
+        flex-direction: row;
+    }
 
-    <!--<div>-->
-        <!--Пациент: {{ patient }}-->
-    <!--</div>-->
+    #flex-container > .flex-item {
+        -webkit-flex: auto;
+        flex: auto;
+    }
 
-    <style>
-        .form-control {
-            display: block;
-            width: 160px;
-            height: 34px;
-            padding: 6px 12px;
-            font-size: 14px;
-            line-height: 1.42857143;
-            color: #555;
-            background-color: #fff;
-            background-image: none;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            -webkit-box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
-            box-shadow: inset 0 1px 1px rgb(0 0 0 / 8%);
-            -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
-            -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-            transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
-        }
-    </style>
+    #flex-container > .raw-item {
+        width: 5rem;
+    }
 
-    <form>
-        <input id="csrf_token" type="hidden" name="csrf_token" value="a2b2332f554e11597b128a133d767b8ca431796bc0bdb84887944f940e127c22">
+    .box {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 15px;
+    }
 
-        <p id="error" class="error display-none"></p>
-        <div class="form-group">
-            <label for="email">Email:</label>
-            <input type="email" class="form-control display-block" id="email" placeholder="ваш email" name="email">
-        </div>
-        <div class="form-group">
-            <label for="pass">Пароль:</label>
-            <div class="input-append input-group">
-                <input type="password" class="form-control" id="pass" placeholder="ваш пароль" name="pass" data-toggle="password">
-                <input type="text" class="form-control" placeholder="ваш пароль" style="display: none;"><span tabindex="100" title="показать/скрыть пароль" class="add-on input-group-addon" style="cursor: pointer;">
-                <i class="icon-eye-open glyphicon glyphicon-eye-open"></i></span>
+    .container .col-25 {
+        width: 25%;
+    }
+
+    .patient-library {
+        margin-top: 2px;
+    }
+
+    .patient-library .text, .icon {
+        color: var(--common);
+        font-size: smaller;
+    }
+
+    .patient-library .text {
+        margin-top: 5px !important;
+    }
+
+    .patient-library .icon {
+        margin-top: 10px;
+    }
+
+    .password-control {
+        color: var(--color-grey);
+        padding: 3px;
+        margin-top: 3px;
+    }
+
+    .password-control__ {
+        margin-top: 20px;
+    }
+
+</style>
+
+<div class="container border-green__">
+    <div class="">
+        <header id="header" class="header flex-item">
+            <a href="/"><img src="/img/logo.png" id="logo-pic" class="w-160"></a>
+
+            <h1 class="mt-10">Вход в трансплант.net</h1>
+        </header>
+
+        <section id="section" class="section flex-item">
+            <form class="flex direction-col font-smaller form">
+                <input id="csrf_token" type="hidden" name="csrf_token" value="a2b2332f554e11597b128a133d767b8ca431796bc0bdb84887944f940e127c22">
+
+                <p id="error" class="error display-none"></p>
+
+                <div class="form-group">
+                    <label for="email">Email:</label>
+                    <input type="email" class="form-control display-block" id="email" placeholder="ваш email" name="email">
+                </div>
+
+                <div class="form-group">
+                    <label for="pass">Пароль:</label>
+                    <div class="flex direction-row">
+                        <input type="password" class="form-control" id="pass" placeholder="ваш пароль" name="password" data-toggle="password">
+
+                        <div class="password-control">
+                            <span id="password-control" data-over="password_control" data-click="password_control" class="material-icons">visibility</span>
+                        </div>
+
+                        <!--<div id="password-show" class="password-control mt-5 display-block">-->
+                            <!--<a class="color-common" href="#">Показать пароль</a>-->
+                        <!--</div>-->
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" name="save" id="save" checked="checked" class="display-inline"> <span>Запомнить меня</span>
+                </div>
+
+                <!--<button type="submit" class="btn btn-primary" style="width:160px" onclick="login();return false">вход</button>-->
+
+                <div class="form-group">
+                    <a href="#" id="sign" data-href="/doc/quest/156" class="btn btn-common display-block">Войти</a>
+
+                    <p class="mt-6">
+                        <a class="color-common decoration-block-hover" href="/usr/pass/form">Не помню пароль</a>
+                    </p>
+                </div>
+
+            </form>
+        </section>
+
+        <footer id="footer" class="footer">
+            <a class="patient-library" href="/infoDoc/doca" target="_blank">
+                <span class="material-icons icon">library_books</span><span class="text"> Библиотека врача</span>
+            </a>
+
+            <a class="patient-library" href="/info" target="_blank">
+                <span class="material-icons icon">library_books</span>
+                <span class="text"> Библиотека пациента</span>
+            </a>
+
+            <div class="patient-library">
+                <span class="text">Техподдержка</span>
+                <span class="text">
+                    <script type="text/javascript">eval(unescape('%64%6f%63%75%6d%65%6e%74%2e%77%72%69%74%65%28%27%3c%61%20%68%72%65%66%3d%22%6d%61%69%6c%74%6f%3a%73%65%72%67%69%6f%6e%6f%76%40%6f%6e%63%6f%6e%65%74%2e%6f%6e%6c%69%6e%65%3f%73%75%62%6a%65%63%74%3d%25%44%31%25%38%32%25%44%31%25%38%30%25%44%30%25%42%30%25%44%30%25%42%44%25%44%31%25%38%31%25%44%30%25%42%46%25%44%30%25%42%42%25%44%30%25%42%30%25%44%30%25%42%44%25%44%31%25%38%32%2e%6e%65%74%22%20%3e%73%65%72%67%69%6f%6e%6f%76%40%6f%6e%63%6f%6e%65%74%2e%6f%6e%6c%69%6e%65%3c%2f%61%3e%27%29%3b'))</script>
+                </span>
             </div>
-        </div>
-        <div class="checkbox">
-            <label><input type="checkbox" name="save" id="save" checked="checked"> Запомнить меня</label>
-        </div>
-
-        <!--<button type="submit" class="btn btn-primary" style="width:160px" onclick="login();return false">вход</button>-->
-
-        <a href="/doc/quest/156" class="btn btn-common display-block">Войти</a>
-
-        <div style="float:right;margin-top:16px"><a href="/usr/pass/form">не помню пароль</a></div>
-
-    </form>
-
+        </footer>
+    </div>
 </div>
+
+<script>
+    // let handler = addEventListener;
+    //
+    // // handler('click', event);
+
+    // console.log({ 'handler ': handler('click', event)  });
+
+    const handler = ((event) => {
+        document.addEventListener(event, (e) => {
+            if (event === 'click') {
+                e.preventDefault();
+
+                const { click } = e.target.dataset;
+
+                if (click === 'password_control') {
+                    console.log({ 'click': click});
+                }
+            }
+
+            if (event === 'mouseover') {
+                // console.log(e.target.dataset);
+
+                const { over } = e.target.dataset;
+
+                if (over === 'password_control') {
+                    e.target.css
+                    console.log({ 'over': over});
+                }
+            }
+        });
+    });
+
+    handler('click');
+
+    handler('mouseover');
+
+
+    // const passwordInput = document.getElementById('pass');
+    // const passwordControl = document.getElementById('password-control');
+    //
+    // // console.log({ 'passwordInput': passwordInput });
+    //
+    // passwordControl.addEventListener('click', function(e) {
+    //     // console.log(e.target);
+    // });
+
+    // $('body').on('click', '.password-control', function(){
+    //     if ($('#password-input').attr('type') == 'password'){
+    //         $(this).html('Скрыть пароль');
+    //         $('#password-input').attr('type', 'text');
+    //     } else {
+    //         $(this).html('Показать пароль');
+    //         $('#password-input').attr('type', 'password');
+    //     }
+    //     return false;
+    // });
+</script>
+
+<!--<div>-->
+<!--Пациент: {{ patient }}-->
+<!--</div>-->
 
 {% endblock %}

@@ -1,8 +1,17 @@
-const fs = require('fs');
-const nunjucks = require('nunjucks');
+const Base = require('./Base.js');
 
-class Patient {
-    constructor() {}
+class Patient extends Base {
+    constructor(res) {
+        super(res);
+    }
+
+    _write(data, type = 'text/html') {
+        this.res.setHeader('Content-Type', type);
+        this.res.write(data);
+
+
+        this.res.end();
+    }
 
     section() {
         console.log('Форма авторизации');
@@ -34,7 +43,9 @@ class Patient {
         return 'after_pat_quest';
     }
 
-    pat_email_edit() {
+    pat_email_edit(params) {
+        this.write('write(): status 200');
+
         console.log('Отправка email пациенту');
 
         return 'pat_email_edit';
