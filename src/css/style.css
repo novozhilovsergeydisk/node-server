@@ -6,7 +6,7 @@
     --color-555: #555555;
     --color-ccc: #cccccc;
     --color-666: #666666;
-    --color-grey: #A1A1A1;
+    --color-grey: #909090;
 }
 
 @charset "utf-8";
@@ -27,7 +27,7 @@ a {
 
     /*border: 1px solid red;*/
 }
-.color-common {
+.color-common{
     color: var(--common);
 }
 .red {
@@ -112,4 +112,39 @@ input {outline: none;}
 }
 #password-control {
     cursor: pointer;
+}
+
+.container .col-25 {
+    width: 25%;
+}
+
+.patient-library {
+    margin-top: 2px;
+}
+
+.patient-library .text, .icon {
+    color: var(--common);
+    font-size: smaller;
+}
+
+.patient-library .text {
+    margin-top: 5px !important;
+}
+
+.patient-library .icon {
+    margin-top: 10px;
+}
+
+.password-control {
+    color: var(--color-grey);
+    padding: 3px;
+    margin-top: 3px;
+}
+
+.password-control:hover {
+    color: #666666;
+}
+
+.password-control:active {
+    color: #245269;
 }

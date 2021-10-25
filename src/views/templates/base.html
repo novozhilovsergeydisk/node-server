@@ -2,11 +2,11 @@
 <html lang="en">
 
 <head>
-{% block header %}
+{% block meta %}
     <meta charset="UTF-8">
 {% endblock %}
 
-    <title>{% block title %}transplant{% endblock %}</title>
+    <title>{{ title }}</title>
 
 {% block css %}
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
@@ -16,16 +16,16 @@
 {% endblock %}
 
 {% block js_top %}
-    <script src=""></script>
+
 {% endblock %}
 </head>
 
-<section class="main">
-    {% block main %} {% endblock %}
-</section>
+{% block content %}
+    <h1>Content</h1>
+{% endblock %}
 
 {% block js_bottom %}
-    <script src=""></script>
+
 {% endblock %}
 
 </body>

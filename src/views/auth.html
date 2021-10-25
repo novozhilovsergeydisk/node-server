@@ -1,72 +1,14 @@
 {% extends "templates/base.html" %}
+{% set title = "Форма авторизации" %}
+{% set _h1 = "Вход в трансплант.net" %}
 
-{% block title %}Форма авторизации{% endblock %}
-
-{% block main %}
-
-<style>
-    #flex-container {
-        display: -webkit-flex;
-        display: flex;
-        -webkit-flex-direction: row;
-        flex-direction: row;
-    }
-
-    #flex-container > .flex-item {
-        -webkit-flex: auto;
-        flex: auto;
-    }
-
-    #flex-container > .raw-item {
-        width: 5rem;
-    }
-
-    .box {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin: 15px;
-    }
-
-    .container .col-25 {
-        width: 25%;
-    }
-
-    .patient-library {
-        margin-top: 2px;
-    }
-
-    .patient-library .text, .icon {
-        color: var(--common);
-        font-size: smaller;
-    }
-
-    .patient-library .text {
-        margin-top: 5px !important;
-    }
-
-    .patient-library .icon {
-        margin-top: 10px;
-    }
-
-    .password-control {
-        color: var(--color-grey);
-        padding: 3px;
-        margin-top: 3px;
-    }
-
-    .password-control__ {
-        margin-top: 20px;
-    }
-
-</style>
-
-<div class="container border-green__">
+{% block content %}
+<div class="container">
     <div class="">
         <header id="header" class="header flex-item">
             <a href="/"><img src="/img/logo.png" id="logo-pic" class="w-160"></a>
 
-            <h1 class="mt-10">Вход в трансплант.net</h1>
+            <h2 class="mt-10">{{ _h1 }}</h2>
         </header>
 
         <section id="section" class="section flex-item">
@@ -189,9 +131,8 @@
     //     return false;
     // });
 </script>
+{% endblock %}
 
 <!--<div>-->
 <!--Пациент: {{ patient }}-->
 <!--</div>-->
-
-{% endblock %}

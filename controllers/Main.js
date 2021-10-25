@@ -42,12 +42,12 @@ class Main {
         return '400 BAD REQUEST';
     }
 
-    static not_found_404(res) {
-        console.log({ '404': 'NOT FOUND', 'res.url': res.url });
+    static not_found_404(req, res) {
+        console.log({ '404': 'NOT FOUND', 'res.url': req.url });
 
         res.setHeader('Content-Type', 'text/html');
         // res.write('<h1>Error</h1>');
-        res.write('<h1>'+res.url+'</h1>');
+        res.write('<h1>'+req.url+'</h1>');
         res.write('<h3>404 NOT FOUND</h3>');
         res.end();
 

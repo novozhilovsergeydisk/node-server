@@ -12,33 +12,27 @@ const mime = require('mime');
 const { createHmac } = require('crypto');
 const promise = import('events');
 
-// ex -------------
-console.log('\x1Bc');
-const buffer = fs.readFileSync('./server.js', 'utf8');
-const src = buffer.toString();
-const lines = src.split('\n').filter(line => !!line);
-const str = lines.join('\n');
-
-fs.writeFileSync('1-test.txt', str);
-
-console.log({ 'buffer': buffer, 'src': src, 'lines': lines, 'str': str });
+// ex 1 -------------
+// console.log('\x1Bc');
+// const buffer = fs.readFileSync('./server.js', 'utf8');
+// const src = buffer.toString();
+// const lines = src.split('\n').filter(line => !!line);
+// const str = lines.join('\n');
+// fs.writeFileSync('1-test.txt', str);
+// console.log({ 'buffer': buffer, 'src': src, 'lines': lines, 'str': str });
 // END ex -------------
 
-
+// ex 2 -------------
 // const secret = 'abcdefg';
 // const hash = createHmac('sha256', secret)
 //     .update('I love cupcakes')
 //     .digest('hex');
-//
 // console.log(hash);
-//
 // const constantsPath = require.resolve('../constants.js');
-//
 // console.log({ 'constantsPath': constantsPath });
-
 // console.log({ 'require.cache': require.cache });
-
 // console.log({ 'appPath': appPath });
+// END ex -------------
 
 class Server {
     start(port, host, route) {
@@ -57,17 +51,6 @@ class Server {
                 return require(controller_path);
             };
 
-            const spread = (...args) => {
-
-                // console.log(args.length);
-                //
-                // args.forEach(item => {
-                //     console.log(item);
-                // });
-
-                return args;
-            }
-
             // res.prototype = spread;
 
             // console.log({ 'test': spread({'up': 'down'}, 'foo', 'bar') });
@@ -77,19 +60,19 @@ class Server {
                     const controllerName = handler;
                     const controllerMethod = action;
 
-                    // console.log({ 'controllerName': controllerName });
+                    console.log({ 'controllerMethod': controllerMethod });
+
+                    console.log({ 'controllerName': controllerName });
 
                     const controllerClass = requireController(controllerName);
 
-                    // console.log({ 'controllerClass': controllerClass });
+                    console.log({ 'controllerClass': controllerClass });
 
                     const controller = new controllerClass(res);
 
-                    // console.log(controller);
+                    // console.log({ 'controller': controller });
 
                     controller[controllerMethod](params);
-
-                    // console.log({ 'controllerMethod': controllerMethod });
 
                     return 'success';
                 } catch(err) {
@@ -99,6 +82,8 @@ class Server {
             });
 
             let findRoute = route.findRoute(req, routes);
+
+            console.log({ 'findRoute': findRoute });
 
             if (req.method == 'GET') {
 
@@ -165,7 +150,7 @@ class Server {
                 }
 
                 if (!findRoute) {
-                    mainController.not_found_404(res);
+                    mainController.not_found_404(req, res);
                 } else {
                     runControllerMethod(res, findRoute.handler, findRoute.action);
                 }
@@ -174,18 +159,25 @@ class Server {
             }
 
             if (req.method == 'POST') {
+
                 if (!findRoute) {
-                    mainController.not_found_404(res);
+                    mainController.not_found_404(req, res);
                 } else {
                     let body = '';
 
                     req.on('data', function(chunk) {
+                        console.log({ 'chunk': chunk });
+
                         body += chunk.toString();
+
+                        console.log({ 'body': body });
+
+                        runControllerMethod(res, findRoute.handler, findRoute.action, body);
                     });
 
-                    // console.log({ 'body': body })
+                    console.log({ 'body out': body });
 
-                    runControllerMethod(res, findRoute.handler, findRoute.action, body);
+                    // runControllerMethod(res, findRoute.handler, findRoute.action, body);
                 }
             }
 

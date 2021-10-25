@@ -5,14 +5,6 @@ class Patient extends Base {
         super(res);
     }
 
-    _write(data, type = 'text/html') {
-        this.res.setHeader('Content-Type', type);
-        this.res.write(data);
-
-
-        this.res.end();
-    }
-
     section() {
         console.log('Форма авторизации');
 
@@ -43,12 +35,50 @@ class Patient extends Base {
         return 'after_pat_quest';
     }
 
-    pat_email_edit(params) {
-        this.write('write(): status 200');
+    emailEdit(params) {
+        this.header('Content-Type', 'text/html');
 
-        console.log('Отправка email пациенту');
+        try {
+            this.nunjucks.configure(this.constants.appPath + '/src/views', { autoescape: true });
 
-        return 'pat_email_edit';
+            const render = this.nunjucks.render('patient-edit.html', params);
+
+            this.write(render);
+        } catch(err) {
+            console.log({'err': err});
+        }
+
+        this.end();
+
+        console.log({ 'text': 'Отправка email пациенту методом post', 'params': params });
+
+        return 'emailPost';
+    }
+
+    emailPost(params) {
+        this.header('Content-Type', 'text/json');
+
+        if (params) {
+            try {
+                this.nunjucks.configure(this.constants.appPath + '/src/views', { autoescape: true });
+
+                const render = this.nunjucks.render('patient-edit.html', params);
+
+                this.write(render);
+            } catch(err) {
+                console.log({'err': err});
+            }
+
+            // this.write(params);
+        } else {
+            this.write('post');
+        }
+
+        this.end();
+
+        console.log({ 'text': 'Отправка email пациенту методом post', 'params': params });
+
+        return 'emailPost';
     }
 
     auth() {

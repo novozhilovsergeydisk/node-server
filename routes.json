@@ -24,9 +24,9 @@
       "handler": "patient",
       "action": "after_pat_quest"
     },
-    "/patient/pat_email_edit": {
+    "/patient/email_edit": {
       "handler": "patient",
-      "action": "pat_email_edit"
+      "action": "emailEdit"
     },
     "/auth/index": {
       "handler": "auth",
@@ -34,9 +34,9 @@
     }
   },
   "post": {
-    "/patient/pat_email_edit": {
+    "/patient/email_edit": {
       "handler": "patient",
-      "action": "pat_email_edit"
+      "action": "emailPost"
     }
   },
   "put": {},

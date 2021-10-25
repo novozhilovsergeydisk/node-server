@@ -1,0 +1,35 @@
+{% extends "templates/base.html" %}
+{% set title = "Default title" %}
+{% set _h1 = " Пациенты transplant.net" %}
+
+{% block content %}
+<div class="container flex direction-col">
+    <header id="header" class="header flex-item">
+        <a href="/"><img src="/img/logo.png" id="logo-pic" class="w-160" alt="logo" /></a>
+
+        <h2 class="mt-10">{{ _h1 }}</h2>
+    </header>
+
+    <section id="section" class="section flex-item">
+        <h1>Content</h1>
+    </section>
+
+    <footer id="footer" class="footer flex-item">
+        <a class="patient-library" href="/infoDoc/doca" target="_blank">
+            <span class="material-icons icon">library_books</span><span class="text"> Библиотека врача</span>
+        </a>
+
+        <a class="patient-library" href="/info" target="_blank">
+            <span class="material-icons icon">library_books</span>
+            <span class="text"> Библиотека пациента</span>
+        </a>
+
+        <div class="patient-library">
+            <span class="text">Техподдержка</span>
+            <span class="text">
+                <script type="text/javascript">eval(unescape('%64%6f%63%75%6d%65%6e%74%2e%77%72%69%74%65%28%27%3c%61%20%68%72%65%66%3d%22%6d%61%69%6c%74%6f%3a%73%65%72%67%69%6f%6e%6f%76%40%6f%6e%63%6f%6e%65%74%2e%6f%6e%6c%69%6e%65%3f%73%75%62%6a%65%63%74%3d%25%44%31%25%38%32%25%44%31%25%38%30%25%44%30%25%42%30%25%44%30%25%42%44%25%44%31%25%38%31%25%44%30%25%42%46%25%44%30%25%42%42%25%44%30%25%42%30%25%44%30%25%42%44%25%44%31%25%38%32%2e%6e%65%74%22%20%3e%73%65%72%67%69%6f%6e%6f%76%40%6f%6e%63%6f%6e%65%74%2e%6f%6e%6c%69%6e%65%3c%2f%61%3e%27%29%3b'))</script>
+            </span>
+        </div>
+    </footer>
+</div>
+{% endblock %}
