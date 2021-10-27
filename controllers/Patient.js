@@ -32,6 +32,8 @@ class Patient extends Base {
     after_pat_quest() {
         console.log('Ваша анкета сохранена');
 
+        // logs/26-10-2021\ 16\:53\:48.log
+
         return 'after_pat_quest';
     }
 
@@ -50,7 +52,7 @@ class Patient extends Base {
 
         this.end();
 
-        console.log({ 'text': 'Отправка email пациенту методом post', 'params': params });
+        console.log({ 'text': 'Отправка email пациенту методом get', 'params': params });
 
         return 'emailPost';
     }

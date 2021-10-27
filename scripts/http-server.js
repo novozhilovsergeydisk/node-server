@@ -1,16 +1,30 @@
 const http = require('http');
-const path = require('path');
+// const path = require('path');
 const fs = require('fs');
-const { mimeTypes } = require('../constants.js');
+// const { mimeTypes } = require('../constants.js');
 const { appPath } = require('../constants.js');
 const cName = 'Main';
 const mainController = require('../controllers/' + cName + '.js');
 const routes = require('../routes.json');
 const capitalizeFirstLetter = require('./capitalize-first-letter');
-const logger = require("../../node_modules/webpack-cli/lib/utils/logger.js");
-const mime = require('mime');
-const { createHmac } = require('crypto');
-const promise = import('events');
+// const mime = require('mime');
+// const util = require('util');
+// const logger = require("../../node_modules/webpack-cli/lib/utils/logger.js");
+// const promise = import('events');
+
+const { logger } = require(appPath + '/utils/Logger');
+
+logger.info();
+
+// const { createLogger, format, transports } = require('winston');
+// const logLevels = {
+//     fatal: 0,
+//     error: 1,
+//     warn: 2,
+//     info: 3,
+//     debug: 4,
+//     trace: 5,
+// };
 
 // ex 1 -------------
 // console.log('\x1Bc');
@@ -23,6 +37,7 @@ const promise = import('events');
 // END ex -------------
 
 // ex 2 -------------
+// const { createHmac } = require('crypto');
 // const secret = 'abcdefg';
 // const hash = createHmac('sha256', secret)
 //     .update('I love cupcakes')
@@ -34,6 +49,8 @@ const promise = import('events');
 // console.log({ 'appPath': appPath });
 // END ex -------------
 
+
+
 class Server {
     start(port, host, route) {
         this.createServer(port, host, route);
@@ -44,6 +61,19 @@ class Server {
         // console.log({ 'route.__proto__': route.__proto__, 'route.prototype': route.prototype });
 
         const server = http.createServer((req, res) => {
+            logger.run();
+
+            // asyncLocalStorage.run(idSeq++, () => {
+            //     logWithId('start');
+            //     // Imagine any chain of async operations here
+            //     setImmediate(() => {
+            //         logWithId('finish');
+            //         // res.end();
+            //     });
+            //
+            //     // logger.info({ 'req.url': req.url });
+            // });
+
             const requireController = (name) => {
                 const controller_path = '../controllers/' + capitalizeFirstLetter(name) + '.js';
                 // console.log({ 'controller_path': controller_path });
@@ -89,7 +119,7 @@ class Server {
 
                 if (/^\/img\/[a-z_]+\.((png)|(jpg)|(ico)|(gif)|(svg))$/.test(req.url)) {
                     const imagePath = appPath + '/src' + req.url;
-                    const mimeType = mime.lookup(req.url);
+                    // const mimeType = mime.lookup(req.url);
 
                     // console.log({ 'mimeType': mimeType });
 

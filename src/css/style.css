@@ -124,7 +124,7 @@ input {outline: none;}
 
 .patient-library .text, .icon {
     color: var(--common);
-    font-size: smaller;
+    font-size: 14px;
 }
 
 .patient-library .text {
