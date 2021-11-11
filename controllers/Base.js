@@ -5,8 +5,7 @@ class Base {
         this.constants = require('../constants');
     }
 
-    write(data = '<h1>test page</h1>', type = 'text/html') {
-        // this.res.setHeader('Content-Type', type);
+    write(data) {
         this.res.write(data);
     }
 

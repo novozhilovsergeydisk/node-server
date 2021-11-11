@@ -17,8 +17,12 @@ const mimeTypes = {
 const appPath = path.resolve(__dirname);
 
 const CONSTANTS = {
-    mimeTypes: mimeTypes,
-    appPath: appPath
+    MIME_TYPES: mimeTypes,
+    APP_PATH: appPath,
+    SCRIPTS_PATH: appPath + '/scripts',
+    RESOURCES_PATH: appPath + '/src',
+    VIEWS_PATH: appPath + '/src/views',
+    CONTROLLERS_PATH: appPath + '/controllers/'
 }
 
 module.exports = CONSTANTS;

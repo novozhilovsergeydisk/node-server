@@ -1,40 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-
 <head>
-{% block meta %}
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="трансплантация">
-{% endblock %}
+    <title>transplant.net</title>
 
-    <title>{{ title }}</title>
-
-{% block css %}
     <link rel="icon" href="/favicon.ico" type="image/ico">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/css/normalize.css">
     <link rel="stylesheet" href="/css/utility.css">
     <link rel="stylesheet" href="/css/style.css">
-{% endblock %}
-
-{% block js_top %}
-
-{% endblock %}
 </head>
-
+<body>
 <div class="container flex direction-col">
     <header id="header" class="header flex-item">
-        <a href="/"><img src="/img/logo.png" id="logo-pic" class="w-160" alt="logo" /></a>
+        <a href="/"><img src="/images/logo.png" id="logo-pic" class="w-160" alt="logo" /></a>
 
-        <h2 class="mt-10">{{ h1 }}</h2>
+        <h2 class="mt-10">transplant.net</h2>
     </header>
 
 
     <section id="section" class="section flex-item">
-        {% block content %}
-        <h1>Content</h1>
-        {% endblock %}
+        <h1>  </h1>
     </section>
 
 
@@ -57,9 +43,13 @@
     </footer>
 </div>
 
-{% block js_bottom %}
 
-{% endblock %}
+
+
+
+
+
+<script src="/js/index.js"></script>
 
 </body>
 </html>
