@@ -19,10 +19,11 @@ const appPath = path.resolve(__dirname);
 const CONSTANTS = {
     MIME_TYPES: mimeTypes,
     APP_PATH: appPath,
-    SCRIPTS_PATH: appPath + '/scripts',
+    SCRIPTS_PATH: appPath + '/server',
     RESOURCES_PATH: appPath + '/src',
     VIEWS_PATH: appPath + '/src/views',
-    CONTROLLERS_PATH: appPath + '/controllers/'
+    CONTROLLERS_PATH: appPath + '/controllers/',
+    STATIC_PATH: path.join(process.cwd(), './static')
 }
 
 module.exports = CONSTANTS;

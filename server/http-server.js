@@ -1,14 +1,48 @@
-const http = require('http');
-const fs = require('fs');
-const path = require('path');
-const { APP_PATH, CONTROLLERS_PATH } = require('../constants.js');
-const controller = require(CONTROLLERS_PATH + 'Controller');
-const routes = require(APP_PATH + '/routes.json');
-const { logger , asyncLocalStorage } = require(APP_PATH + '/utils/Logger');
-const mime = require('mime');
-const STATIC_PATH = path.join(process.cwd(), './static');
+'use strict'
 
-console.log({ 'process.cwd': process.cwd() });
+const user = { patient: 'Новожилов Сергей', age: 57 };
+
+const { http, fs, path, DB, controller, STATIC_PATH } = require('./bootstrap.js');
+
+// console.log(user);
+
+const db = new DB();
+const result = db.query('SELECT__ NOW()');
+
+console.log({ 'result': result });
+
+Object.keys(result).forEach(item => {
+    console.log(item);
+});
+
+const { Client } = require('pg');
+
+let client = new Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'transplant_net_ru',
+    password: 'postgres_12345',
+    port: 5432,
+});
+client.connect();
+client.query('SELECT__ NOW()', (err, res) => {
+    // console.log(err, res.rows, '\n--------------------------------\n');
+});
+
+const sqlPool = {
+    inactiveAccountDays: 'select inactive_account_days from oneline',
+    cabList: 'select id, name from cabinet order by name',
+    admList: 'select a.id, a.name, a.email, a.activate_key akey, 10 - datediff(\'day\', a.create_time, current_timestamp) days_left from account a inner join cab_acct ca on ca.account = a.id where a.is_adm and ca.cabinet = 59 order by a.name',
+    docList: 'select a.name, a.email, 10 - datediff(\'day\', a.create_time, current_timestamp) days_left, (select count(*) from v_channel where doctor = a.id) pat_cnt from account a inner join cab_acct ca on ca.account = a.id and a.is_doc where ca.cabinet = 59 order by a.name',
+    patCnt: 'select count(*) from account a inner join v_channel dp on dp.patient = a.id inner join cab_acct ca on ca.account = dp.doctor where ca.cabinet = 59'
+};
+
+Object.values(sqlPool).forEach(sql => {
+    // client.query(sql, (err, res) => {
+    //     console.log(err, res.rows);
+    // });
+
+});
 
 const MIME_TYPES = {
     html: 'text/html; charset=UTF-8',
@@ -20,35 +54,35 @@ const MIME_TYPES = {
     svg:  'image/svg+xml',
 };
 
-const serveFile = (client) => {
-    const { req, name } = client;
+class Files {
+    static serve(client) {
+        const { req, name } = client;
 
-    const filePath = path.join(STATIC_PATH, name);
+        const filePath = path.join(STATIC_PATH, name);
 
-    if (!filePath.startsWith(STATIC_PATH)) {
-        console.log(`Can't be served: ${name}`);
-        return null;
-    }
+        if (!filePath.startsWith(STATIC_PATH)) {
+            console.log(`Can't be served: ${name}`);
+            return null;
+        }
 
-    const promiseStream = new Promise((resolve, reject) => {
-        fs.stat(filePath, (error, stats) => {
-            if (error) {
-                const error_stream = 'No resource file: ' + req.url;
-                reject(error_stream);
-            }
-            else {
-                const stream = fs.createReadStream(filePath);
-                stream._stats = stats;
-                console.log(`Served resource file and resolve promise: ${name}`);
-                resolve(stream);
-            }
+        const promiseStream = new Promise((resolve, reject) => {
+            fs.stat(filePath, (error, stats) => {
+                if (error) {
+                    const error_stream = 'No resource file: ' + req.url;
+                    reject(error_stream);
+                }
+                else {
+                    const stream = fs.createReadStream(filePath);
+                    stream._stats = stats;
+                    console.log(`Served resource file and resolve promise: ${name}`);
+                    resolve(stream);
+                }
+            });
         });
-    });
 
-    return promiseStream;
-};
-
-const user = { patient: 'Новожилов Сергей', age: 57 };
+        return promiseStream;
+    };
+}
 
 class Route {
     routing = {
@@ -101,7 +135,7 @@ class Route {
         console.log({ 'type': type, 'renderer': renderer });
         console.log({ 'route': route, 'par': par });
         const result = renderer(route, par, this.client);
-        console.log({ 'result': result })
+        console.log({ 'result': result });
         return result;
     }
 }
@@ -189,7 +223,7 @@ class Server {
 
     statics(client) {
         const promiseStream = new Promise((resolve) => {
-            resolve(serveFile(client));
+            resolve(Files.serve(client));
         });
         promiseStream.then(stream => {
             client.res.writeHead(200, { 'Content-Type': client.mimeType });
