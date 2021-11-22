@@ -148,3 +148,7 @@ input {outline: none;}
 .password-control:active {
     color: #245269;
 }
+
+#block-content {
+    padding: 7px;
+}

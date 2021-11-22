@@ -9,6 +9,7 @@ class Controller {
         try {
             const controllerName = handler;
             const controllerMethod = action;
+            console.log(controllerMethod);
             const requireController = (name) => {
                 const controller_path = CONTROLLERS_PATH + capitalizeFirstLetter(name) + '.js';
 
@@ -16,6 +17,27 @@ class Controller {
             };
             const className = requireController(controllerName);
             const controller = new className( client, params );
+            controller[controllerMethod]();
+
+            return true;
+        } catch(err) {
+            console.log({ 'ERROR': err });
+            return false;
+        }
+    }
+
+    static resolve(client) {
+        try {
+            const controllerName = client.handler;
+            const controllerMethod = client.action;
+            console.log(controllerMethod);
+            const requireController = (name) => {
+                const controller_path = CONTROLLERS_PATH + capitalizeFirstLetter(name) + '.js';
+
+                return require(controller_path);
+            };
+            const className = requireController(controllerName);
+            const controller = new className( client, client.params );
             controller[controllerMethod]();
 
             return true;

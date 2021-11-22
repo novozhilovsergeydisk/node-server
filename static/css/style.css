@@ -148,3 +148,12 @@ input {outline: none;}
 .password-control:active {
     color: #245269;
 }
+
+#block-content {
+    padding-top: 5px;
+}
+
+#block-content > p {
+    font-size: smaller;
+    padding-top: 3px;
+}

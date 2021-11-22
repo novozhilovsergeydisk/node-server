@@ -18,14 +18,23 @@ class Main extends commonController {
     }
 
     index() {
-        this.res.setHeader('Content-Type', 'text/html');
+        // this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
         // this.params = { title: 'Transplant.net', foo: 'bar', items: { rapsberry: 'Microsoft', chrome: 'Google' } };
         this.nunjucks.configure(this.constants.VIEWS_PATH, { autoescape: true });
+        console.log({ 'this.params': this.params });
         const render = this.nunjucks.render('index.html', this.params);
         this.res.write(render);
         this.res.end('');
 
         return 'index';
+    }
+
+    static notFound() {
+        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+        res.write('<h3>404 NOT FOUND</h3>');
+        res.end();
+
+        return '404 NOT FOUND';
     }
 
     // static success(body='200 OK') {
@@ -52,17 +61,17 @@ class Main extends commonController {
     //     return '400 BAD REQUEST';
     // }
     //
-    // static not_found_404() {
-    //     console.log({ '404': 'NOT FOUND', 'res.url': req.url });
-    //
-    //     res.setHeader('Content-Type', 'text/html');
-    //     // res.write('<h1>Error</h1>');
-    //     res.write('<h1>'+req.url+'</h1>');
-    //     res.write('<h3>404 NOT FOUND</h3>');
-    //     res.end();
-    //
-    //     return '404 NOT FOUND';
-    // }
+    static not_found_404() {
+        console.log({ '404': 'NOT FOUND', 'res.url': req.url });
+
+        res.setHeader('Content-Type', 'text/html');
+        // res.write('<h1>Error</h1>');
+        res.write('<h1>'+req.url+'</h1>');
+        res.write('<h3>404 NOT FOUND</h3>');
+        res.end();
+
+        return '404 NOT FOUND';
+    }
 }
 
 module.exports = Main;
