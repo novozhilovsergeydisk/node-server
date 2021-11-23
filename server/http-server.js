@@ -192,15 +192,15 @@ class Route {
         const f3 = (fn, par, client) => fn(client, par);
         const f4 = (client) => this.statics(client);
 
-        console.log({ 'f1': f1, 'f2': f2, 'f3': f3, 'renderObj.route': renderObj.route });
+        // console.log({ 'f1': f1, 'f2': f2, 'f3': f3, 'renderObj.route': renderObj.route });
 
         // f2(renderObj.client, renderObj.par);
 
-        if (this.client.mimeType === 'text/html; charset=UTF-8') {
-            f3(f2, renderObj.par, renderObj.client);
-        } else {
-            f3(f4, renderObj.par, renderObj.client);
-        }
+        // if (this.client.mimeType === 'text/html; charset=UTF-8') {
+        //     f3(f2, renderObj.par, renderObj.client);
+        // } else {
+        //     f3(f4, renderObj.par, renderObj.client);
+        // }
 
         // renderer(route, par, this.client);
 
@@ -251,11 +251,13 @@ class Server {
     execute(client) {
         Promise.resolve()
             .then(() => {
-                new Route(client).resolve();
+                return new Route(client).resolve();
 
                 // return route(client);
             })
-            .then(renderingObject => {
+            .then(obj => {
+                obj.renderer(obj.route, obj.par, obj.client);
+
                 // return renderingObject;
 
                 // Route.test(client);
