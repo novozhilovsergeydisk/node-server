@@ -4,6 +4,7 @@
  * Получить список параметром функции.
  * @param fn Функция
  */
+
 const getFunctionParams = fn => {
     const COMMENTS = /(\/\/.*$)|(\/\*[\s\S]*?\*\/)|(\s*=[^,\)]*(('(?:\\'|[^'\r\n])*')|("(?:\\"|[^"\r\n])*"))|(\s*=[^,\)]*))/gm;
     const DEFAULT_PARAMS = /=[^,]+/gm;
@@ -22,32 +23,6 @@ const getFunctionParams = fn => {
 
     return params || [];
 };
-
-const getFullName = (name, surname, middlename, data) => {
-    console.log(surname + ' ' + name + ' ' + middlename, data);
-};
-console.log(getFunctionParams(getFullName)); // ["name", "surname", "middlename"]
-
-// const toString = getFullName.toString();
-
-// console.log({ 'toString': getFullName.toString() });
-
-
-
-
-
-const obj = { a: 1 };
-obj.__proto__ = { b: 2 };
-
-console.log({ 'obj': obj, 'obj.a': obj.a, 'obj.b': obj.b });
-console.log({ 'obj.__proto__': obj.__proto__ });
-console.log({ 'obj.prototype': obj.prototype });
-console.log(obj.hasOwnProperty('a')); // true
-console.log(obj.hasOwnProperty('b')) // false
-
-
-
-
 
 /**
  * Получить строковое представление тела функции.
@@ -74,16 +49,6 @@ const getFunctionBody = fn => {
     return trimmedBody;
 };
 
-// Получим список параметров и тело функции getFullName
-const getFullName2 = (name, surname, middlename) => {
-    console.log(surname + ' ' + name + ' ' + middlename);
-};
-console.log(getFunctionBody(getFullName));
-console.log(getFunctionBody(getFullName2));
-
-
-
-
 
 
 const { http, fs, path, db, controller, STATIC_PATH } = require('./bootstrap.js');
@@ -104,7 +69,7 @@ class Files {
     static serve(client) {
         const { req, name } = client;
         const filePath = path.join(STATIC_PATH, name);
-        console.log({ 'url client': client.req.url, 'client.mimeType': client.mimeType });
+        // console.log({ 'url client': client.req.url, 'client.mimeType': client.mimeType });
         if (!filePath.startsWith(STATIC_PATH)) {
             console.log(`Can't be served: ${name}`);
             return null;
@@ -143,6 +108,7 @@ class Route {
     };
 
     types = {
+
         object: JSON.stringify,
         string: s => s,
         number: n => n + '',
@@ -158,6 +124,9 @@ class Route {
             if (key.includes('*')) {
                 const rx = new RegExp(key.replace('*', '(.*)'));
                 const route = this.routing[key];
+
+                console.log({ 'route.__proto__': route.__proto__, 'route.prototype': route.prototype, 'typeof route': typeof route,'key': key });
+
                 this.matching.push([rx, route]);
                 delete this.routing[key];
             }
@@ -165,17 +134,15 @@ class Route {
     };
 
     resolve() {
-        // console.log({ 'routing': this.routing });
+
+        // console.log({ 'this.client.req.url': this.client.req.url });
+
+
+
         // console.log({ 'matching': this.matching });
         let par;
         let route = this.routing[this.client.req.url];
-        let renderObj = {};
-
-        const arr = this.client.req.url.split('/');
-        renderObj.controller = arr[1] ? arr[1] : '';
-        renderObj.method = arr[2] ? arr[2] : '';
-
-        console.log({ 'renderObj': renderObj });
+        const renderObj = {};
 
         if (!route) {
             for (let i = 0; i < this.matching.length; i++) {
@@ -190,20 +157,54 @@ class Route {
         }
         const type = typeof route;
         const renderer = this.types[type];
-        console.log({ 'type': type, 'renderer': renderer });
-        console.log({ 'route': route, 'par': par });
+        // console.log({ 'type': type, 'renderer': renderer });
+        // console.log({ 'route': route, 'par': par });
         this.client.res.writeHead(200, { 'Content-Type': this.client.mimeType });
 
+        // console.log(getFunctionParams(renderer));
+
+
+        if (this.client.mimeType === 'text/html; charset=UTF-8') {
+            const arr = this.client.req.url.split('/');
+            this.client.controller = arr[1] ? arr[1] : 'main';
+            this.client.method = arr[2] ? arr[2] : 'index';
+        }
+
         renderObj.client = this.client;
-        renderObj.route = this.route;
-        renderObj.par = this.par;
+        renderObj.route = route;
+        renderObj.renderer = renderer;
+        renderObj.intraspectionFunctionParams = getFunctionParams(renderer);
+        renderObj.par = par;
 
-        const result = renderer(route, par, this.client);
-        console.log({ 'result': result });
+        // console.log({ 'renderObj': renderObj});
+        // console.log('');
+
+        // getFunctionParams(renderObj.renderer);
+
+        // console.log({ 'typeof enderObj.renderer': typeof renderObj.renderer, 'typeof renderObj.route': renderObj.route });
+
+        console.log({ 'type': type, 'renderObj.route': renderObj.route, 'par': par, 'renderObj.par': renderObj.par, 'renderer': renderer, 'renderObj.renderer': renderObj.renderer });
 
 
 
-        return result;
+        const f1 = this.types.function;
+        const f2 = (client, par) => this.callController(client, par);
+        const f3 = (fn, par, client) => fn(client, par);
+        const f4 = (client) => this.statics(client);
+
+        console.log({ 'f1': f1, 'f2': f2, 'f3': f3, 'renderObj.route': renderObj.route });
+
+        // f2(renderObj.client, renderObj.par);
+
+        if (this.client.mimeType === 'text/html; charset=UTF-8') {
+            f3(f2, renderObj.par, renderObj.client);
+        } else {
+            f3(f4, renderObj.par, renderObj.client);
+        }
+
+        // renderer(route, par, this.client);
+
+        return renderObj;
     };
 
     statics(client) {
@@ -228,11 +229,18 @@ class Route {
 
     };
 
+    foo(par) {
+        console.log(par);
+    }
+
     notFound(client) {
         controller.call(client, 'main', 'notFound', null);
     }
 
     callController(client, controllerName='main', action='index', data=null) {
+        // console.log({ 'getFunctionParams(controller.call)': getFunctionParams(controller.call) });
+        controllerName = (client.controller) ? client.controller : controllerName;
+        action = (client.action) ? client.action : action;
         controller.call(client, controllerName, action, data);
     };
 }
@@ -256,7 +264,7 @@ class Server {
                 // return getData(renderingObject)
             })
             .then(data => {
-                console.log('.then 2');
+                // console.log('.then 2');
                 // return render(data);
             })
             .catch(err => {

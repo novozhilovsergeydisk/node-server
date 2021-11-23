@@ -6,22 +6,16 @@ const commonController = require('./Common.js');
 class Main extends commonController {
     constructor(client, params) {
         super(client);
-
         this.req = client.req;
         this.res = client.res;
-
-        if (params === null) {
-            this.params = {};
-        } else {
-            this.params = params;
-        }
+        this.params = (params === null) ? {} : params;
     }
 
     index() {
         // this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
         // this.params = { title: 'Transplant.net', foo: 'bar', items: { rapsberry: 'Microsoft', chrome: 'Google' } };
         this.nunjucks.configure(this.constants.VIEWS_PATH, { autoescape: true });
-        console.log({ 'this.params': this.params });
+        // console.log({ 'this.params': this.params });
         const render = this.nunjucks.render('index.html', this.params);
         this.res.write(render);
         this.res.end('');
@@ -62,11 +56,11 @@ class Main extends commonController {
     // }
     //
     static not_found_404() {
-        console.log({ '404': 'NOT FOUND', 'res.url': req.url });
+        console.log({ '404': 'NOT FOUND', 'res.url': this.req.url });
 
         res.setHeader('Content-Type', 'text/html');
         // res.write('<h1>Error</h1>');
-        res.write('<h1>'+req.url+'</h1>');
+        res.write('<h1>' + this.req.url + '</h1>');
         res.write('<h3>404 NOT FOUND</h3>');
         res.end();
 
