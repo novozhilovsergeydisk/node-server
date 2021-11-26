@@ -104,7 +104,7 @@ class Files {
 }
 
 class Route {
-    routing = {'get': {
+    routing = {'GET': {
             '/': (client, par) => this.callController(client, par),
             '/main/index': (client, par) => this.callController(client, par),
             '/main/index/*': (client, par) => this.callController(client, par),
@@ -129,19 +129,19 @@ class Route {
 
     constructor(client) {
         this.client = client;
-        for (const key in this.routing['get']) {
+        for (const key in this.routing[client.http_method]) {
             if (key.includes('*')) {
                 const rx = new RegExp(key.replace('*', '(.*)'));
-                const route = this.routing['get'][key];
+                const route = this.routing[client.http_method][key];
                 this.matching.push([rx, route]);
-                delete this.routing['get'][key];
+                delete this.routing[client.http_method][key];
             }
         }
     };
 
     resolve() {
         let par;
-        let route = this.routing['get'][this.client.req.url];
+        let route = this.routing['GET'][this.client.req.url];
         const renderObj = {};
         if (!route) {
             for (let i = 0; i < this.matching.length; i++) {
@@ -319,6 +319,7 @@ class Server {
             if (req.method === 'GET') {
                 const { url } = req;
 
+                client.http_method = req.method;
                 client.name = url;
                 client.fileExt = path.extname(client.name).substring(1);
                 client.mimeType = MIME_TYPES[client.fileExt] || MIME_TYPES.html;
