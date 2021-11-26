@@ -1,35 +1,29 @@
 // const nunjucks = require('nunjucks');
 // const { VIEWS_PATH } = require('../constants')
+const { log } = require('../server/bootstrap.js');
 
 const commonController = require('./Common.js');
 
 class Main extends commonController {
-    constructor(client, params) {
+    constructor(client) {
         super(client);
-        this.req = client.req;
-        this.res = client.res;
-        this.params = (params === null) ? {} : params;
+        this.params = (client.params === null) ? {} : client.params;
     }
 
     index() {
-        // this.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-        // this.params = { title: 'Transplant.net', foo: 'bar', items: { rapsberry: 'Microsoft', chrome: 'Google' } };
-        this.nunjucks.configure(this.constants.VIEWS_PATH, { autoescape: true });
+        this.nunjucks.configure(this.VIEWS_PATH, { autoescape: true });
         // console.log({ 'this.params': this.params });
-        const render = this.nunjucks.render('index.html', this.params);
-        this.res.write(render);
-        this.res.end('');
-
-        return 'index';
+        const content = this.nunjucks.render('index.html', this.params);
+        return content;
     }
 
-    static notFound() {
-        res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-        res.write('<h3>404 NOT FOUND</h3>');
-        res.end();
-
-        return '404 NOT FOUND';
-    }
+    // notFound() {
+    //     // res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+    //     this.client.res.write('<h3>404 NOT FOUND</h3>');
+    //     this.client.res.end();
+    //
+    //     return '404 NOT FOUND';
+    // }
 
     // static success(body='200 OK') {
     //     this.res.setHeader('Content-Type', 'text/html');
@@ -55,17 +49,6 @@ class Main extends commonController {
     //     return '400 BAD REQUEST';
     // }
     //
-    static not_found_404() {
-        console.log({ '404': 'NOT FOUND', 'res.url': this.req.url });
-
-        res.setHeader('Content-Type', 'text/html');
-        // res.write('<h1>Error</h1>');
-        res.write('<h1>' + this.req.url + '</h1>');
-        res.write('<h3>404 NOT FOUND</h3>');
-        res.end();
-
-        return '404 NOT FOUND';
-    }
 }
 
 module.exports = Main;

@@ -1,11 +1,10 @@
-{% extends "templates/404.html" %}
-
-{% block title %}
-    404 страница не найдена
+{% extends "templates/error.html" %}
+{% set title = "404 not found" %}
+{% block css %}
+{{ super() }}
 {% endblock %}
-
 {% block main %}
 <div class="container">
-    <h1>404 страница не найдена</h1>
+    <h3>404 not found</h3>
 </div>
 {% endblock %}

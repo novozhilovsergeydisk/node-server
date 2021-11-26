@@ -1,52 +1,25 @@
 const path = require('path');
-const { CONTROLLERS_PATH, SCRIPTS_PATH } = require(path.resolve(__dirname, '../constants.js'));
-const { capitalizeFirstLetter } = require(SCRIPTS_PATH + '/helpers');
+const { CONTROLLERS_PATH, SERVER_PATH } = require(path.resolve(__dirname, '../constants.js'));
+const { capitalizeFirstLetter, log, getFunctionParams } = require(SERVER_PATH + '/helpers');
 
 class Controller {
     constructor() {}
 
-    static call(client, handler, action, params) {
+    static call(client, handler='', action='', params=null) {
         try {
-            console.log({ 'handler': handler, 'action': action });
-            const controllerName = handler;
-            const controllerMethod = action;
-            // console.log(controllerMethod);
-            const requireController = (name) => {
-                const controller_path = CONTROLLERS_PATH + capitalizeFirstLetter(name) + '.js';
-
-                return require(controller_path);
-            };
+            log({ 'controller': handler, 'action': action });
+            const controllerName = client.controller ? client.controller : handler;
+            const controllerMethod = client.action ? client.action : action;
+            client.params = client.params ? client.params : params;
+            const requireController = (name) => require(CONTROLLERS_PATH + capitalizeFirstLetter(name) + '.js');
             const className = requireController(controllerName);
-            const controller = new className( client, params );
-            controller[controllerMethod]();
-
-            return true;
+            const controller = new className(client);
+            return controller[controllerMethod]();
         } catch(err) {
-            console.log({ 'ERROR': err });
+            console.log({ 'Error controller call': err });
             return false;
         }
     }
-
-    // static resolve(client) {
-    //     try {
-    //         const controllerName = client.handler;
-    //         const controllerMethod = client.action;
-    //         console.log(controllerMethod);
-    //         const requireController = (name) => {
-    //             const controller_path = CONTROLLERS_PATH + capitalizeFirstLetter(name) + '.js';
-    //
-    //             return require(controller_path);
-    //         };
-    //         const className = requireController(controllerName);
-    //         const controller = new className( client, client.params );
-    //         controller[controllerMethod]();
-    //
-    //         return true;
-    //     } catch(err) {
-    //         console.log({ 'ERROR': err });
-    //         return false;
-    //     }
-    // }
 }
 
 module.exports = Controller;

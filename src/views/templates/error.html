@@ -1,14 +1,16 @@
-<!doctype html>
 <html lang="en">
 
 <head>
-    {% block header %}
+    {% block meta %}
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="трансплантация">
     {% endblock %}
 
-    <title>{% block title %}Error transplant.net{% endblock %}</title>
+    <title>{{ title }}</title>
 
     {% block css %}
+    <link rel="icon" href="/favicon.ico" type="image/ico">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="/css/normalize.css">
     <link rel="stylesheet" href="/css/utility.css">
@@ -16,16 +18,18 @@
     {% endblock %}
 
     {% block js_top %}
-    <script src=""></script>
+
     {% endblock %}
 </head>
 
-<section class="main">
-    {% block main %} {% endblock %}
+<section id="section">
+    {% block main %}
+
+    {% endblock %}
 </section>
 
 {% block js_bottom %}
-<script src=""></script>
+
 {% endblock %}
 
 </body>

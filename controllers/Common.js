@@ -1,13 +1,19 @@
+const { SERVER_PATH, VIEWS_PATH } = require('../constants.js');
+const nunjucks = require('nunjucks');
+const { log } = require(SERVER_PATH + '/helpers');
+
 class Common {
     constructor(client) {
         this.client = client;
-        this.nunjucks = require('nunjucks');
-        this.constants = require('../constants.js');
+        this.nunjucks = nunjucks;
+        this.VIEWS_PATH = VIEWS_PATH;
     }
 
     notFound(text='404 not found') {
-        this.client.res.write(text);
-        this.client.res.end();
+        this.nunjucks.configure(this.VIEWS_PATH, { autoescape: true });
+        // log({ 'this.client.params': this.client.params });
+        const content = this.nunjucks.render('404.html', this.client.params);
+        return content;
     }
 }
 
