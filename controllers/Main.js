@@ -17,6 +17,12 @@ class Main extends commonController {
         return content;
     }
 
+    contacts() {
+        this.nunjucks.configure(this.VIEWS_PATH, { autoescape: true });
+        const content = this.nunjucks.render('contacts.html', this.params);
+        return content;
+    }
+
     // notFound() {
     //     // res.setHeader('Content-Type', 'text/html; charset=UTF-8');
     //     this.client.res.write('<h3>404 NOT FOUND</h3>');

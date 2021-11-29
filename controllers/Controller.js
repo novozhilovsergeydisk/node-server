@@ -7,13 +7,23 @@ class Controller {
 
     static call(client, handler='', action='', params=null) {
         try {
-            log({ 'controller': handler, 'action': action });
+            // log({ 'handler': handler, 'action': action });
             const controllerName = client.controller ? client.controller : handler;
+            // log({ 'controllerName': controllerName });
             const controllerMethod = client.action ? client.action : action;
             client.params = client.params ? client.params : params;
-            const requireController = (name) => require(CONTROLLERS_PATH + capitalizeFirstLetter(name) + '.js');
-            const className = requireController(controllerName);
-            const controller = new className(client);
+
+            const requireController = require(CONTROLLERS_PATH + capitalizeFirstLetter(handler) + '.js');
+
+            log({ 'handler': handler, 'controllerName': controllerName, 'requireController': requireController });
+
+            // const requireController = (name) => {
+            //     log({ 'name': name });
+            //     require(CONTROLLERS_PATH + capitalizeFirstLetter(name) + '.js');
+            // }
+
+            // const className = requireController(handler);
+            const controller = new requireController(client);
             return controller[controllerMethod]();
         } catch(err) {
             console.log({ 'Error controller call': err });
