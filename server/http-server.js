@@ -2,6 +2,8 @@
 
 const { http, fs, path, log, controller, STATIC_PATH, getFunctionParams } = require('./bootstrap.js');
 
+// const f = (fn, client, controller, action, par, roles) => fn(client, controller, action, roles, par);
+
 const MIME_TYPES = {
     html: 'text/html; charset=UTF-8',
     js:   'application/javascript; charset=UTF-8',
@@ -20,6 +22,9 @@ const user = { patient: 'Новожилов Сергей', age: 57 };
 class Files {
     serve(client) {
         const { name } = client;
+
+        // log({ 'client.name': client.name });
+
         const filePath = path.join(STATIC_PATH, name);
 
         return Promise.resolve()
@@ -37,7 +42,7 @@ class Files {
                     return result;
                 }
 
-                // log({ 'result': result });
+                log({ 'serve()': result });
 
                 return result;
             })
@@ -98,13 +103,13 @@ class Aux {
         client.res.setHeader('Content-Type', client.mimeType);
     }
 
-    static callController = (client, controllerName='main', action='index', data=null) => {
-        log({ 'controllerName': controllerName, 'action': action });
+    static callController = (client, controllerName='main', action='index', data=null, roles=null) => {
+        // log({ 'controllerName': controllerName, 'action': action, 'data': data, 'roles': roles });
 
         // controllerName = (client.controller) ? client.controller : controllerName;
         action = (client.action) ? client.action : action;
         const prom = new Promise((resolve) => {
-            log({ 'controllerName 2': controllerName, 'action 2': action });
+            // log({ 'controllerName Promise((resolve)': controllerName, 'action 2': action });
 
             resolve(controller.call(client, controllerName, action, data));
         });
@@ -138,6 +143,8 @@ class Aux {
 
         const prom = new Promise((resolve) => resolve(new Files().serve(client)));
         return prom.then(stream => {
+            // log({ 'stream.status': stream.status });
+
             // if (stream.status === 'failed') {
             //     // stream.stream = this.callController(client, 'main', 'notFound');
             // }
@@ -175,10 +182,12 @@ class Aux {
                 console.log({ 'Error while execute': err });
                 return null;
             });
-
     }
 
     static send = (entries, client) => {
+
+        // log({ 'entries': entries });
+
         const content = entries.content['stream'];
         if (client.mimeType === 'text/html; charset=UTF-8') {
             this.setHeader(client);
@@ -209,7 +218,7 @@ class Aux {
                 client.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
                 client.res.write('<h3>404 not found!</h3>');
                 client.res.end('<h5>' + client.mimeType + '</h5>');
-                log({ 'content instanceof Promise': content instanceof Promise });
+                // log({ 'content instanceof Promise': content instanceof Promise });
             }
         }
         // log('\n-----------------------------\n');
@@ -218,9 +227,9 @@ class Aux {
 
 class Route {
     routing = {'GET': {
-            '/': (client, par) => Aux.callController(client, 'main', 'index', par),
-            '/index': (client, par) => Aux.callController(client, 'main', 'index', par),
-            '/index/*': (client, par) => Aux.callController(client, 'main', 'index', par),
+            '/': (client, par) => Aux.callController(client, 'main', 'index', par, {roles: ['user']}),
+            '/index': (client, par) => Aux.callController(client, 'main', 'index', par, {roles: ['user', 'admin']}),
+            '/index/*': (client, controller, action, par, roles) => Aux.callController(client, 'main', 'index', par, { roles: ['user', 'admin'] }),
             '/user': user,
             '/user/patient': () => user.patient,
             '/user/age': () => user.age,
@@ -244,7 +253,7 @@ class Route {
         for (const key in this.routing[client.http_method]) {
             if (key.includes('*')) {
 
-                log({ 'key.replace()': '^' + key.replace('*', '(.*)') });
+                // log({ 'key.replace()': '^' + key.replace('*', '(.*)') });
 
                 const rx = new RegExp('^' + key.replace('*', '(.*)'));
                 const route = this.routing[client.http_method][key];
@@ -255,7 +264,7 @@ class Route {
     };
 
     resolve() {
-        log({ 'this.matching': this.matching });
+        // log({ 'this.matching': this.matching });
 
         let par;
         let route = this.routing['GET'][this.client.req.url];
@@ -266,7 +275,7 @@ class Route {
 
                 par = this.client.req.url.match(rx[0]);
 
-                log({ 'this.client.req.url': this.client.req.url, 'rx[0]': rx[0], 'par': par });
+                // log({ 'this.client.req.url': this.client.req.url, 'rx[0]': rx[0], 'par': par });
 
                 if (par) {
                     par.shift();
@@ -276,7 +285,7 @@ class Route {
             }
         }
 
-        log({ 'route': route });
+        // log({ 'route': route });
 
         const type = typeof route;
         const renderer = this.types[type];
@@ -288,6 +297,9 @@ class Route {
         renderObj.client = this.client;
         renderObj.route = route;
         renderObj.renderer = renderer;
+
+        // log({ 'renderer': renderer });
+
         renderObj.intraspectionRendererParams = getFunctionParams(renderer);
         renderObj.par = par;
         // log(renderObj.renderer);
@@ -309,14 +321,26 @@ class Server {
 
             if (req.method === 'GET') {
                 try {
+                    // log({ 're': re });
+
                     const { url } = req;
                     client.http_method = req.method;
                     client.name = url;
                     client.fileExt = path.extname(client.name).substring(1);
                     client.mimeType = MIME_TYPES[client.fileExt] || MIME_TYPES.html;
-                    const data = Aux.execute(client);
-                    // log({ 'content': content });
-                    data.then(entries => {
+
+                    // log({ 'Aux.callController': Aux.callController });
+                    // const re = f(Aux.callController, client, 'main', 'test', null, null);
+                    //
+                    // re.then(data => {
+                    //     log({ 'data': data });
+                    //     Aux.send(data, client);
+                    // });
+
+                    Aux.execute(client).then(entries => {
+
+                        // log({ 'client.name': client.name });
+
                         Aux.send(entries, client);
                     });
                 } catch(err) {

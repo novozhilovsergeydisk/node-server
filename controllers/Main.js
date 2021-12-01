@@ -1,6 +1,4 @@
-// const nunjucks = require('nunjucks');
-// const { VIEWS_PATH } = require('../constants')
-const { log } = require('../server/bootstrap.js');
+// const { log } = require('../server/bootstrap.js');
 
 const commonController = require('./Common.js');
 
@@ -23,38 +21,10 @@ class Main extends commonController {
         return content;
     }
 
-    // notFound() {
-    //     // res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-    //     this.client.res.write('<h3>404 NOT FOUND</h3>');
-    //     this.client.res.end();
-    //
-    //     return '404 NOT FOUND';
-    // }
-
-    // static success(body='200 OK') {
-    //     this.res.setHeader('Content-Type', 'text/html');
-    //     this.res.write(body);
-    //     this.res.end();
-    //
-    //     return body;
-    // }
-    //
-    // static internal_error_500() {
-    //     this.res.setHeader('Content-Type', 'text/html');
-    //     this.res.write('500 INTERNAL SERVER ERROR');
-    //     this.res.end();
-    //
-    //     return '500 INTERNAL SERVER ERROR';
-    // }
-    //
-    // static bad_request_400(res) {
-    //     res.setHeader('Content-Type', 'text/html');
-    //     res.write('400 BAD REQUEST');
-    //     res.end();
-    //
-    //     return '400 BAD REQUEST';
-    // }
-    //
+    test() {
+        const content = '<h1>test</h1>h1>';
+        return content;
+    }
 }
 
 module.exports = Main;

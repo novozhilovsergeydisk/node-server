@@ -8,7 +8,6 @@ class Router {
 
         /*const pattern =/^\/$|^\/[a-z]+\/[a-z]+\/?$|^\/[a-z]+\/index\/?$|^\/[a-z]+\/show\/\d+$|^\/[a-z]+\/create\/?$|^\/[a-z]+\/edit\/\d+$|^\/[a-z]+\/update\/\d+$|^\/[a-z]+\/store\/?$|^\/[a-z]+\/destroy\/\d+$/g*/
 
-
         const pattern =/^\/$|^\/[a-z_]+\/[a-z_]+\/?$|^\/$|^\/[a-z_]+\/[a-z_]+\/\d+$/g
 
         let result = false;

@@ -15,7 +15,7 @@ class Controller {
 
             const requireController = require(CONTROLLERS_PATH + capitalizeFirstLetter(handler) + '.js');
 
-            log({ 'handler': handler, 'controllerName': controllerName, 'requireController': requireController });
+            // log({ 'handler': handler, 'controllerName': controllerName, 'requireController': requireController });
 
             // const requireController = (name) => {
             //     log({ 'name': name });

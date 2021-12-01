@@ -22,15 +22,28 @@
     {% endblock %}
 </head>
 
-<section id="section">
-    {% block main %}
+<body>
+    <header>
+    {% block header %}
 
     {% endblock %}
-</section>
+    </header>
 
-{% block js_bottom %}
+    <section>
+    {% block content %}
 
-{% endblock %}
+    {% endblock %}
+    </section>
+
+    <footer>
+    {% block footer %}
+
+    {% endblock %}
+    </footer>
+
+    {% block js_bottom %}
+
+    {% endblock %}
 
 </body>
 </html>
