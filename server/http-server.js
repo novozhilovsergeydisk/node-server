@@ -22,11 +22,7 @@ const user = { patient: 'Новожилов Сергей', age: 57 };
 class Files {
     serve(client) {
         const { name } = client;
-
-        // log({ 'client.name': client.name });
-
         const filePath = path.join(STATIC_PATH, name);
-
         return Promise.resolve()
             .then(() => {
                 return this.exists(filePath)
@@ -36,14 +32,11 @@ class Files {
                     client.file = filePath;
                     result.stream = this.stream(client);
                 }
-
                 if (result.status === 'failed') {
                     result.stream = null;
                     return result;
                 }
-
-                log({ 'serve()': result });
-
+                // log({ 'serve()': result });
                 return result;
             })
             .catch(err => {
@@ -166,70 +159,31 @@ class Aux {
                 return new Route(client).resolve();
             })
             .then(fn => {
-                // log({ 'fn': fn });
+
+                log({ 'fn': fn });
+
                 return this.render(fn);
             })
             .then(content => {
-                return {
-                    content: content,
-                    data: {
-                        patient: 'Иванов И.И.',
-                        doctor: 'Новожилов С.Ю.'
-                    }
-                }
+                content.data = {
+                    patient: 'Иванов И.И.',
+                    doctor: 'Новожилов С.Ю.'
+                };
+
+                return { content: content };
             })
             .catch(err => {
                 console.log({ 'Error while execute': err });
                 return null;
             });
     }
-
-    static send = (entries, client) => {
-
-        // log({ 'entries': entries });
-
-        const content = entries.content['stream'];
-        if (client.mimeType === 'text/html; charset=UTF-8') {
-            this.setHeader(client);
-            if (content === null || content === undefined) {
-                client.res.end('404 not found');
-            } else {
-                client.res.end(content);
-            }
-        } else {
-            if (content instanceof Promise) {
-                this.setHeader(client);
-                // log({ 'content instanceof Promise': content instanceof Promise });
-                // log({ 'client.mimeType': client.mimeType, 'entries': entries });
-                content.then(stream => {
-                    // log({ 'stream': stream });
-                    // return stream;
-                    if (stream) {
-                        this.setHeader(client);
-                        // log({ 'stream@': client.req.url });
-                        // console.log({ 'stream': stream });
-                        stream.pipe(client.res);
-                        // res.end();
-                    }
-                }).catch(error_stream => {
-                    console.log({ 'Error stream in send': error_stream });
-                });
-            } else {
-                client.res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-                client.res.write('<h3>404 not found!</h3>');
-                client.res.end('<h5>' + client.mimeType + '</h5>');
-                // log({ 'content instanceof Promise': content instanceof Promise });
-            }
-        }
-        // log('\n-----------------------------\n');
-    };
 }
 
 class Route {
     routing = {'GET': {
             '/': (client, par) => Aux.callController(client, 'main', 'index', par, {roles: ['user']}),
             '/index': (client, par) => Aux.callController(client, 'main', 'index', par, {roles: ['user', 'admin']}),
-            '/index/*': (client, controller, action, par, roles) => Aux.callController(client, 'main', 'index', par, { roles: ['user', 'admin'] }),
+            '/index/*': (client, par) => Aux.callController(client, 'main', 'index', par, { roles: ['user', 'admin'] }),
             '/user': user,
             '/user/patient': () => user.patient,
             '/user/age': () => user.age,
@@ -267,16 +221,13 @@ class Route {
         // log({ 'this.matching': this.matching });
 
         let par;
-        let route = this.routing['GET'][this.client.req.url];
+        let route = this.routing['GET'][this.client.name];
         const renderObj = {};
         if (!route) {
             for (let i = 0; i < this.matching.length; i++) {
                 const rx = this.matching[i];
-
-                par = this.client.req.url.match(rx[0]);
-
+                par = this.client.name.match(rx[0]);
                 // log({ 'this.client.req.url': this.client.req.url, 'rx[0]': rx[0], 'par': par });
-
                 if (par) {
                     par.shift();
                     route = rx[1];
@@ -284,22 +235,18 @@ class Route {
                 }
             }
         }
-
         // log({ 'route': route });
-
         const type = typeof route;
         const renderer = this.types[type];
         if (this.client.mimeType === 'text/html; charset=UTF-8') {
-            const arr = this.client.req.url.split('/');
+            const arr = this.client.name.split('/');
             this.client.controller = arr[1] ? arr[1] : 'main';
             this.client.method = arr[2] ? arr[2] : 'index';
         }
         renderObj.client = this.client;
         renderObj.route = route;
         renderObj.renderer = renderer;
-
         // log({ 'renderer': renderer });
-
         renderObj.intraspectionRendererParams = getFunctionParams(renderer);
         renderObj.par = par;
         // log(renderObj.renderer);
@@ -309,39 +256,57 @@ class Route {
 
 class Server {
     constructor() {};
-
     // render = fn => {
     //     return fn.renderer(fn.route, fn.par, fn.client)
     // }
-
     createServer(port, host) {
         const server = http.createServer((req, res) => {
-            let client = { req, res };
+            let client = {}; // { req, res };
             // log({ 'res': res });
-
             if (req.method === 'GET') {
                 try {
                     // log({ 're': re });
-
                     const { url } = req;
                     client.http_method = req.method;
                     client.name = url;
                     client.fileExt = path.extname(client.name).substring(1);
                     client.mimeType = MIME_TYPES[client.fileExt] || MIME_TYPES.html;
 
-                    // log({ 'Aux.callController': Aux.callController });
-                    // const re = f(Aux.callController, client, 'main', 'test', null, null);
-                    //
-                    // re.then(data => {
-                    //     log({ 'data': data });
-                    //     Aux.send(data, client);
-                    // });
-
                     Aux.execute(client).then(entries => {
-
-                        // log({ 'client.name': client.name });
-
-                        Aux.send(entries, client);
+                        const content = entries.content['stream'];
+                        if (client.mimeType === 'text/html; charset=UTF-8') {
+                            res.setHeader('Content-Type', client.mimeType);
+                            if (content === null || content === undefined) {
+                                res.end('404 not found');
+                            } else {
+                                res.end(content);
+                            }
+                        } else {
+                            if (content instanceof Promise) {
+                                res.setHeader('Content-Type', client.mimeType);
+                                // log({ 'content instanceof Promise': content instanceof Promise });
+                                // log({ 'client.mimeType': client.mimeType, 'entries': entries });
+                                content.then(stream => {
+                                    // log({ 'stream': stream });
+                                    // return stream;
+                                    if (stream) {
+                                        res.setHeader('Content-Type', client.mimeType);
+                                        // log({ 'stream@': client.req.url });
+                                        // console.log({ 'stream': stream });
+                                        stream.pipe(res);
+                                        // res.end();
+                                    }
+                                }).catch(error_stream => {
+                                    console.log({ 'Error stream in send': error_stream });
+                                });
+                            } else {
+                                res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+                                res.write('<h3>404 not found!</h3>');
+                                res.end('<h5>' + client.mimeType + '</h5>');
+                                // log({ 'content instanceof Promise': content instanceof Promise });
+                            }
+                        }
+                        // Aux.send(entries, client);
                     });
                 } catch(err) {
                     log({ 'Error while execute()': err });
