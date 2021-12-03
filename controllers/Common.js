@@ -1,6 +1,6 @@
 const { SERVER_PATH, VIEWS_PATH } = require('../constants.js');
 const nunjucks = require('nunjucks');
-const { log } = require(SERVER_PATH + '/helpers');
+// const { log } = require(SERVER_PATH + '/helpers');
 
 class Common {
     constructor(client) {

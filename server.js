@@ -1,7 +1,6 @@
 'use strict';
 
 const server = require('./server/http-server');
-
 const HOST_NAME = '127.0.0.1';
 const PORT = 3000;
 
@@ -9,42 +8,75 @@ server.start(PORT, HOST_NAME);
 
 
 
-
-
-// 'use strict';
-//
-// const fs = require('fs');
 // const http = require('http');
-// const path = require('path');
+// const Client = require('./server/classes/Client.js');
+// const Session = require('./server/classes/Session.js');
 //
-// const STATIC_PATH = path.join(process.cwd(), './static');
-//
-// const MIME_TYPES = {
-//     html: 'text/html; charset=UTF-8',
-//     js: 'application/javascript; charset=UTF-8',
-//     css: 'text/css',
-//     png: 'image/png',
-//     ico: 'image/x-icon',
-//     svg: 'image/svg+xml',
+// const routing = {
+//     '/': async () => '<h1>welcome to homepage</h1><hr>',
+//     '/start': async (client) => {
+//         Session.start(client);
+//         return `Session token is: ${client.token}`;
+//     },
+//     '/destroy': async (client) => {
+//         const result = `Session destroyed: ${client.token}`;
+//         Session.delete(client);
+//         return result;
+//     },
+//     '/api/method1': async (client) => {
+//         if (client.session) {
+//             client.session.set('method1', 'called');
+//             return { data: 'example result' };
+//         } else {
+//             return { data: 'access is denied' };
+//         }
+//     },
+//     '/api/method2': async (client) => ({
+//         url: client.req.url,
+//         headers: client.req.headers,
+//     }),
+//     '/api/method3': async (client) => {
+//         if (client.session) {
+//             return [...client.session.entries()]
+//                 .map(([key, value]) => `<b>${key}</b>: ${value}<br>`)
+//                 .join();
+//         }
+//         return 'No session found';
+//     },
 // };
 //
-// const serveFile = name => {
-//     const filePath = path.join(STATIC_PATH, name);
-//     if (!filePath.startsWith(STATIC_PATH)) {
-//         console.log(`Can't be served: ${name}`);
-//         return null;
+// const types = {
+//     object: JSON.stringify,
+//     string: (s) => s,
+//     number: (n) => n.toString(),
+//     undefined: () => 'not found',
+// };
+//
+// http.createServer(async (req, res) => {
+//     const client = await Client.getInstance(req, res);
+//     const { method, url, headers } = req;
+//     console.log(`${method} ${url} ${headers.cookie}`);
+//     const handler = routing[url];
+//
+//     console.log({ 'handler': handler });
+//
+//     res.on('finish', () => {
+//         if (client.session) client.session.save();
+//     });
+//     if (!handler) {
+//         res.statusCode = 404;
+//         res.end('Not found 404');
+//         return;
 //     }
-//     const stream = fs.createReadStream(filePath);
-//     console.log(`Served: ${name}`);
-//     return stream;
-// };
-//
-// http.createServer((req, res) => {
-//     const { url } = req;
-//     const name = url === '/' ? '/index.html' : url;
-//     const fileExt = path.extname(name).substring(1);
-//     const mimeType = MIME_TYPES[fileExt] || MIME_TYPES.html;
-//     res.writeHead(200, { 'Content-Type': mimeType });
-//     const stream = serveFile(name);
-//     if (stream) stream.pipe(res);
+//     handler(client).then((data) => {
+//         const type = typeof data;
+//         const serializer = types[type];
+//         const result = serializer(data);
+//         client.sendCookie();
+//         res.end(result);
+//     }, (err) => {
+//         res.statusCode = 500;
+//         res.end('Internal Server Error 500');
+//         console.log(err);
+//     });
 // }).listen(8000);
