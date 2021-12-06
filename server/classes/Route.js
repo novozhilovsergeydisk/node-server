@@ -3,21 +3,29 @@
 const { APP_PATH, CONTROLLERS_PATH } = require('../../constants.js');
 const { asyncLocalStorage } = require(APP_PATH + '/server/classes/Logger');
 const Files = require(APP_PATH + '/server/classes/Files');
-const { getFunctionParams } = require('../helpers');
+const { log, getFunctionParams } = require('../helpers');
 const controller = require(CONTROLLERS_PATH + 'Controller');
 
 const user = { patient: 'Новожилов Сергей', age: 57 };
 
 class Route {
-    routing = {'GET': {
+    routing = {
+        'GET': {
             '/': (client, par) => this.handler(client, 'main', 'index', par, {roles: ['user']}),
             '/index': (client, par) => this.handler(client, 'main', 'index', par, {roles: ['user', 'admin']}),
             '/index/*': (client, par) => this.handler(client, 'main', 'index', par, { roles: ['user', 'admin'] }),
-            '/user': user,
+            '/api/activate/*': (client, par) => this.handler(client, 'main', 'activate', par, {roles: ['admin']}),
+            '/api/refresh': (client, par) => this.handler(client, 'main', 'refresh', par, {roles: ['admin']}),
+            '/users': (client, par) => this.handler(client, 'main', 'users', par, {roles: ['admin']}),
             '/user/patient': () => user.patient,
             '/user/age': () => user.age,
             '/user/*': (client, par) => 'parameter=' + par[0],
             '/*': (client, par) => this.statics(client, par)
+        },
+        'POST': {
+            '/registration': (client, par) => this.handler(client, 'main', 'registration', par, {roles: ['admin']}),
+            '/login': (client, par) => this.handler(client, 'main', 'login', par, {roles: ['admin']}),
+            '/logut': (client, par) => this.handler(client, 'main', 'logout', par, {roles: ['admin']})
         }
     };
 
@@ -25,7 +33,7 @@ class Route {
         object: JSON.stringify,
         string: s => s,
         number: n => n + '',
-        undefined: () => 'not found',
+        undefined: () => { return { status: '404 not found' } },
         function: (fn, par, client) => fn(client, par),
     };
 
@@ -111,8 +119,15 @@ class Route {
     resolve() {
         // log({ 'this.matching': this.matching });
 
+        log({ 'this.client': this.client });
+
         let par;
-        let route = this.routing['GET'][this.client.name];
+        let route = this.routing[this.client.http_method][this.client.name];
+
+        log({ 'this.client.http_method': this.client.http_method });
+        log({ 'this.client.name': this.client.name });
+        log({ 'route': route });
+
         const renderObj = {};
         if (!route) {
             for (let i = 0; i < this.matching.length; i++) {
@@ -135,6 +150,7 @@ class Route {
             this.client.method = arr[2] ? arr[2] : 'index';
         }
         renderObj.client = this.client;
+
         renderObj.route = route;
         renderObj.renderer = renderer;
         // log({ 'renderer': renderer });

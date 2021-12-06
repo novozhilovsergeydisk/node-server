@@ -22,8 +22,58 @@ class Main extends commonController {
     }
 
     test() {
-        const content = '<h1>test</h1>h1>';
+        const content = '<h1>test()</h1>h1>';
         return content;
+    }
+
+    activate() {
+        try {
+
+        } catch(e) {
+
+        }
+    }
+
+    refresh() {
+        try {
+
+        } catch(e) {
+
+        }
+    }
+
+    users() {
+        try {
+            const content = '<h1>users()</h1>';
+            return content;
+        } catch(e) {
+
+        }
+    }
+
+    registration() {
+        try {
+
+        } catch(e) {
+
+        }
+    }
+
+    login() {
+        try {
+            const content = '<h1>login()</h1>';
+            return content;
+        } catch(e) {
+
+        }
+    }
+
+    logout() {
+        try {
+
+        } catch(e) {
+
+        }
     }
 }
 

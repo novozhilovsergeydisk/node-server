@@ -1,6 +1,7 @@
 'use strict';
 
 const storage = require('./Storage.js');
+const { log } = require('../bootstrap.js');
 
 const TOKEN_LENGTH = 32;
 const ALPHA_UPPER = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
@@ -30,6 +31,7 @@ class Session extends Map {
         const token = generateToken();
         client.token = token;
         const session = new Session(token);
+        // log({ 'session': session });
         client.session = session;
         client.setCookie('token', token);
         storage.set(token, session);
@@ -44,6 +46,7 @@ class Session extends Map {
             return new Promise((resolve, reject) => {
                 storage.get(sessionToken, (err, session) => {
                     if (err) reject(new Error('No session'));
+                    // log({ 'session': session, 'Session': Session, 'Session.prototype': Session.prototype });
                     Object.setPrototypeOf(session, Session.prototype);
                     client.token = sessionToken;
                     client.session = session;

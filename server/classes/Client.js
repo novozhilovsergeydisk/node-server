@@ -40,7 +40,7 @@ class Client {
         const { req } = this;
         const { cookie } = req.headers;
 
-        log({ 'cookie': cookie })
+        // log({ 'cookie': cookie });
 
         if (!cookie) return;
         const items = cookie.split(';');
