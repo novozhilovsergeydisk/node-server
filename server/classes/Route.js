@@ -18,8 +18,7 @@ class Route {
             '/api/refresh': (client, par) => this.handler(client, 'main', 'refresh', par, {roles: ['admin']}),
             '/users': (client, par) => this.handler(client, 'main', 'users', par, {roles: ['admin']}),
             '/user/patient': () => user.patient,
-            '/user/age': () => user.age,
-            '/user/*': (client, par) => 'parameter=' + par[0],
+            '/user/doctor': (client, par) => 'parameter=' + par[0],
             '/*': (client, par) => this.statics(client, par)
         },
         'POST': {

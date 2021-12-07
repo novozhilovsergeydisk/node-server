@@ -7,7 +7,7 @@ class Controller {
 
     static call(client, handler='', action='', params=null) {
         try {
-            log({ 'handler': handler, 'action': action });
+            // log({ 'handler': handler, 'action': action });
             // const controllerName = client.controller ? client.controller : handler;
             // const controllerMethod = client.action ? client.action : action;
             client.params = client.params ? client.params : params;

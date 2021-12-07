@@ -1,8 +1,77 @@
 'use strict'
 
-const { http, path, log, controller, Route } = require('./bootstrap.js');
+const { http, path, log, db, Route } = require('./bootstrap.js');
 const Client = require('./classes/Client.js');
 // const Session = require('./classes/Session.js');
+
+let pg = db.open({
+    user: 'postgres',
+    host: '127.0.0.1',
+    database: 'transplant_net_ru',
+    password: 'postgres_12345',
+    port: 5432
+});
+
+class Model {
+    constructor() {
+        this.select_ = null;
+        this.where_ = null;
+        this.fields_ = [];
+        this.order_ = null;
+    }
+
+    select(text) {
+        this.select_ = text;
+        return this;
+    }
+
+    where(text) {
+        this.where_ = text;
+        return this;
+    }
+
+    fields(text) {
+        this.fields_ = text;
+        return this;
+    }
+
+    order(text) {
+        this.order_ = text;
+        return this;
+    }
+
+    run() {
+        return new Promise((resolve) => {
+            pg
+                .select(this.select_)
+                .where(this.where_)
+                .fields(this.fields_)
+                .order(this.order_)
+                .then((rows) => {
+                    resolve(rows);
+                });
+        });
+    }
+}
+
+let model = new Model()
+    .select('users u')
+    .fields(['u.id', 'u.email'])
+    .run();
+
+model = new Model().select('account a inner join cab_acct ca on ca.account = a.id and a.is_doc').where({'ca.cabinet': 59}).fields(['a.name', 'a.email']).run();
+log({ model });
+model = new Model()
+    .select('users u')
+    .run();
+log({ model });
+
+model.then(entries => {
+    log(entries);
+    log(typeof entries);
+});
+
+// log(typeof data);
 
 const MIME_TYPES = {
     html: 'text/html; charset=UTF-8',
@@ -30,13 +99,13 @@ class Server {
             })
             .then(fn => {
 
-                log({ 'fn': fn });
+                // log({ 'fn': fn });
 
                 return fn.renderer(fn.route, fn.par, fn.client);
             })
             .then(content => {
 
-                log({ 'content': content });
+                // log({ 'content': content });
 
                 if (content === 'not found') {
                     content = {};
@@ -68,7 +137,7 @@ class Server {
 
                     if (cookies instanceof Promise) {
                         cookies.then(data => {
-                            log({ 'url': url, 'data': data });
+                            // log({ 'url': url, 'data': data });
                         });
                     }
 
@@ -126,7 +195,7 @@ class Server {
 
                     if (cookies instanceof Promise) {
                         cookies.then(data => {
-                            log({ 'url': url, 'data': data });
+                            // log({ 'url': url, 'data': data });
                         });
                     }
 
