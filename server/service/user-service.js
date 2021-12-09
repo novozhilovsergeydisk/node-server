@@ -10,7 +10,7 @@ class UserService {
         }
         const hashPassword = await bcrypt.hash(password, 3);
         const activationLink = uuid.v4();
-        const user = await this.create({ email, password: hashPassword, activationLi });
+        const user = await this.create({ email, password: hashPassword, activationLink });
     }
 
     findOne (email) {

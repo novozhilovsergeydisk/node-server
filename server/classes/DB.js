@@ -1,6 +1,7 @@
 'use strict';
 
 const { Pool } = require('pg');
+const { log, start, end } = require('../helpers');
 
 const where = (conditions) => {
     let clause = '';
@@ -110,6 +111,9 @@ class Cursor {
     }
 
     then(callback) {
+
+        // log( callback );
+
         // TODO: store callback to pool
         const { mode, table, columns, args } = this;
         const { whereClause, orderBy, columnName } = this;
@@ -119,7 +123,9 @@ class Cursor {
         if (orderBy) sql += ` ORDER BY ${orderBy}`;
 
         this.database.query(sql, args,  (err, res) => {
-            console.log({ 'sql': sql, 'args': args, 'err': err });
+            log('Cursor: this.pool.query');
+            log({ sql, args, callback });
+            end();
 
 
             // if (err) {
@@ -166,12 +172,29 @@ class Database {
             values = [];
         }
         const startTime = new Date().getTime();
-        // console.log({ sql, values });
+
+        log({ callback });
+
         this.pool.query(sql, values, (err, res) => {
+            start();
+            log('Database: this.pool.query');
+            log({ sql, values, callback });
+
+            // log({ 'cb': callback(err, res) });
+
+            // if (err) {
+            //     log({ err });
+            // }
+
             const endTime = new Date().getTime();
             const executionTime = endTime - startTime;
             console.log(`Execution time: ${executionTime} ms`);
+            // console.log(this.Client);
+
             if (callback) callback(err, res);
+
+            log('END ---------------------------------------------');
+            log('');
         });
     }
 

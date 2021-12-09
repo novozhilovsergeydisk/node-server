@@ -8,11 +8,33 @@ const controller = require(CONTROLLERS_PATH + 'Controller');
 const routes = require(APP_PATH + '/routes.json');
 const { logger, asyncLocalStorage } = require(APP_PATH + '/server/classes/Logger');
 const db = require(APP_PATH + '/server/classes/DB');
-const { log, getFunctionParams } = require('./helpers');
+const { log, start, end, getFunctionParams } = require('./helpers');
 const mime = require('mime');
-const Files = require(APP_PATH + '/server/classes/Files');
-const Route = require(APP_PATH + '/server/classes/Route');
-
+const Files = require('./classes/Files');
+const Route = require('./classes/Route');
+const model = require('./classes/Model');
+const { secret } = require('./config.js')
 log({ 'process.cwd': process.cwd() });
 
-module.exports = { http, fs, path, db, controller, routes, mime, log, getFunctionParams, logger, Files, Route, asyncLocalStorage, APP_PATH, CONTROLLERS_PATH, STATIC_PATH };
+module.exports = {
+    http,
+    fs,
+    path,
+    db,
+    controller,
+    routes,
+    model,
+    mime,
+    secret,
+    log,
+    start,
+    end,
+    getFunctionParams,
+    logger,
+    Files,
+    Route,
+    asyncLocalStorage,
+    APP_PATH,
+    CONTROLLERS_PATH,
+    STATIC_PATH
+};

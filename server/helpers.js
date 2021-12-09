@@ -8,6 +8,16 @@ const capitalizeFirstLetter = (string) => {
 
 const log = data => console.log(data);
 
+const start = () => {
+    log('');
+    log('START ---------------------------------------------');
+}
+
+const end = () => {
+    log('END ---------------------------------------------');
+    log('');
+}
+
 /**
  * Получить список параметром функции.
  * @param fn Функция
@@ -56,4 +66,4 @@ const getFunctionBody = fn => {
     return trimmedBody;
 };
 
-module.exports = { capitalizeFirstLetter, log, getFunctionParams, getFunctionParams };
+module.exports = { capitalizeFirstLetter, log, start, end, getFunctionParams, getFunctionParams };
