@@ -2,10 +2,12 @@
 
 const { http, path, secret, log, db, model, Route } = require('./bootstrap.js');
 const Client = require('./classes/Client.js');
-const { Buffer } = require('buffer');
+// const { Buffer } = require('buffer');
 const uuid = require('uuid');
-const { Pool } = require('pg');
+// const { Pool } = require('pg');
 // const Session = require('./classes/Session.js');
+
+// log({ db });
 
 let pg = db.open({
     user: 'postgres',
@@ -15,43 +17,41 @@ let pg = db.open({
     port: 5432
 });
 
-const pool = new Pool({
-    user: 'postgres',
-    host: '127.0.0.1',
-    database: 'transplant_net_ru',
-    password: 'postgres_12345',
-    port: 5432
-});
+// log( pg.pool );
 
-// callback
-pool.query('SELECT NOW() as now', (err, res) => {
-    if (err) {
-        console.log(err.stack)
-    } else {
-        console.log(res.rows[0])
-    }
-});
+// const pool = new Pool({
+//     user: 'postgres',
+//     host: '127.0.0.1',
+//     database: 'transplant_net_ru',
+//     password: 'postgres_12345',
+//     port: 5432
+// });
+
+// log({ pool });
+
+// pool.query('SELECT NOW() as now', (err, res) => {
+//     if (err) {
+//         console.log(err.stack)
+//     } else {
+//         console.log(res.rows[0])
+//     }
+// });
 
 // promise
 // const prom = pool
 //     .query(sql, values)
 //     .then(res => console.log(res.rowCount))
 //     .catch(e => console.error({ 'error stack': e.stack }));
-//
-//
-//
-// log({ prom });
 
 let sql = "insert into users values(nextval('users_id_seq'), $1, $2, $3)";
 let values = ['doctor@transplant.' + uuid.v4(), uuid.v4(), false];
-model.query(sql, values).then(data => log({ data }));
+model.query(sql, values).then(data => log({ 'data 1': data }));
+model.query('SELECT NOW() as now').then(data => log({ 'data 2': data }));
 
 const cb = (err, data) => {
     // log({ data: data, error: err });
     return { data: data, error: err };
 };
-
-
 
 // new Model().save();
 
@@ -62,13 +62,16 @@ const cb = (err, data) => {
 
 // log({ 'new Model().save() ': new Model().save() });
 
-// const strSql = 'account a inner join cab_acct ca on ca.account = a.id and a.is_doc';
-// new Model()
-//     .select(strSql)
-//     .where({'ca.cabinet': 59})
-//     .fields(['a.name', 'a.email'])
-//     .run()
-//     .then(data => log({ 'Model.then(data)': data }));
+sql = 'account a inner join cab_acct ca on ca.account = a.id and a.is_doc';
+const cursor =
+    pg
+    .select(sql)
+    .where({'ca.cabinet': 59})
+    .fields(['a.name', 'a.email'])
+    // .run()
+    .then(data => log({ 'Model.then(data)': data }));
+
+log({ cursor });
 
 // model = new Model();
 // model

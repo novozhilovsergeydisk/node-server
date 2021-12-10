@@ -1,6 +1,6 @@
-const { Pool } = require('pg')
+const db = require('./DB.js');
 
-const pool = new Pool({
+const pg = db.open({
     user: 'postgres',
     host: '127.0.0.1',
     database: 'transplant_net_ru',
@@ -69,4 +69,4 @@ class Model {
     };
 }
 
-module.exports = new Model(pool);
+module.exports = new Model(pg.pool);

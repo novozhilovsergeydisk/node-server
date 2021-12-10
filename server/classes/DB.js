@@ -123,10 +123,9 @@ class Cursor {
         if (orderBy) sql += ` ORDER BY ${orderBy}`;
 
         this.database.query(sql, args,  (err, res) => {
-            log('Cursor: this.pool.query');
-            log({ sql, args, callback });
-            end();
-
+            // start();
+            // log({ sql, args, callback });
+            // end();
 
             // if (err) {
             //     console.log({ 'sql': sql, 'err': err });
@@ -176,9 +175,9 @@ class Database {
         log({ callback });
 
         this.pool.query(sql, values, (err, res) => {
-            start();
-            log('Database: this.pool.query');
-            log({ sql, values, callback });
+            // start();
+            // log('Database: this.pool.query');
+            // log({ sql, values, callback });
 
             // log({ 'cb': callback(err, res) });
 
@@ -193,8 +192,7 @@ class Database {
 
             if (callback) callback(err, res);
 
-            log('END ---------------------------------------------');
-            log('');
+            // end();
         });
     }
 
