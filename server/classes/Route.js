@@ -3,28 +3,58 @@
 const { APP_PATH, CONTROLLERS_PATH } = require('../../constants.js');
 const { asyncLocalStorage } = require(APP_PATH + '/server/classes/Logger');
 const Files = require(APP_PATH + '/server/classes/Files');
-const { log, getFunctionParams } = require('../helpers');
+const { DTOFactory, log, getFunctionParams, capitalizeFirstLetter } = require('../helpers');
 const controller = require(CONTROLLERS_PATH + 'Controller');
 
 const user = { patient: 'Новожилов Сергей', age: 57 };
 
+const handler = (client, controllerName='main', action='index', data=null, roles=null) => {
+    action = (client.action) ? client.action : action;
+    const handlerPromise = new Promise((resolve) => {
+        resolve(controller.call(client, controllerName, action, data));
+    });
+    return handlerPromise.then(data => {
+        const entries = DTOFactory({
+            info: 'Call controller ' + capitalizeFirstLetter(controllerName),
+            status: 'success',
+            stream: data,
+        });
+        return new Promise(resolve => {
+            resolve(entries);
+        });
+    }).catch(err => {
+        const entries = DTOFactory({
+            info: 'Call controller ' + capitalizeFirstLetter(controllerName),
+            status: 'failed',
+            error: err,
+            stream: null,
+        });
+        return new Promise(reject => {
+            reject(entries);
+        });
+    });
+};
+
+
 class Route {
     routing = {
         'GET': {
-            '/': (client, par) => this.handler(client, 'main', 'index', par, {roles: ['user']}),
-            '/index': (client, par) => this.handler(client, 'main', 'index', par, {roles: ['user', 'admin']}),
-            '/index/*': (client, par) => this.handler(client, 'main', 'index', par, { roles: ['user', 'admin'] }),
-            '/api/activate/*': (client, par) => this.handler(client, 'main', 'activate', par, {roles: ['admin']}),
-            '/api/refresh': (client, par) => this.handler(client, 'main', 'refresh', par, {roles: ['admin']}),
-            '/users': (client, par) => this.handler(client, 'main', 'users', par, {roles: ['admin']}),
+            '/': (client, par) => handler(client, 'main', 'index', par, {roles: ['user']}),
+            '/index': (client, par) => handler(client, 'main', 'index', par, {roles: ['user', 'admin']}),
+            '/contacts': (client, par) => handler(client, 'main', 'contacts', par, {roles: ['user', 'admin']}),
+            '/index/*': (client, par) => handler(client, 'main', 'index', par, { roles: ['user', 'admin'] }),
+            '/api/activate/*': (client, par) => handler(client, 'main', 'activate', par, {roles: ['admin']}),
+            '/api/refresh': (client, par) => handler(client, 'main', 'refresh', par, {roles: ['admin']}),
+            '/users': (client, par) => handler(client, 'main', 'users', par, {roles: ['admin']}),
             '/user/patient': () => user.patient,
             '/user/doctor': (client, par) => 'parameter=' + par[0],
-            '/*': (client, par) => this.statics(client, par)
+            '/*': (client, par) => this.statics(client, par),
+            '/registration': (client, par) => handler(client, 'main', 'registration', par, {roles: ['user']})
         },
         'POST': {
-            '/registration': (client, par) => this.handler(client, 'main', 'registration', par, {roles: ['admin']}),
-            '/login': (client, par) => this.handler(client, 'main', 'login', par, {roles: ['admin']}),
-            '/logut': (client, par) => this.handler(client, 'main', 'logout', par, {roles: ['admin']})
+            '/registration': (client, par) => handler(client, 'main', 'registration', par, {roles: ['admin']}),
+            '/login': (client, par) => handler(client, 'main', 'login', par, {roles: ['admin']}),
+            '/logut': (client, par) => handler(client, 'main', 'logout', par, {roles: ['admin']})
         }
     };
 
@@ -42,9 +72,6 @@ class Route {
         this.client = client;
         for (const key in this.routing[client.http_method]) {
             if (key.includes('*')) {
-
-                // log({ 'key.replace()': '^' + key.replace('*', '(.*)') });
-
                 const rx = new RegExp('^' + key.replace('*', '(.*)'));
                 const route = this.routing[client.http_method][key];
                 this.matching.push([rx, route]);
@@ -53,61 +80,9 @@ class Route {
         }
     };
 
-    handler(client, controllerName='main', action='index', data=null, roles=null) {
-        // log({ 'controllerName': controllerName, 'action': action, 'data': data, 'roles': roles });
-
-        // controllerName = (client.controller) ? client.controller : controllerName;
-        action = (client.action) ? client.action : action;
-
-        const prom = new Promise((resolve) => {
-            // log({ 'controllerName Promise((resolve)': controllerName, 'action 2': action });
-
-            // log({ 're': controller.call(client, controllerName, action, data) });
-
-            resolve(controller.call(client, controllerName, action, data));
-        });
-
-        // log({ 're': controller.call(client, controllerName, action, data) });
-
-        return prom.then(data => {
-            return new Promise(resolve => {
-                const entries = {
-                    state: 'call controller',
-                    info: 'controller' + controllerName,
-                    status: 'success',
-                    error: '',
-                    stream: data
-                };
-
-                // log({ 'entries': entries });
-
-                resolve(entries);
-            });
-        }).catch(err => {
-            return new Promise(reject => {
-                const entries = {
-                    state: 'call controller',
-                    info: 'controller' + controllerName,
-                    status: 'failed',
-                    error: err,
-                    stream: null
-                };
-                reject(entries);
-            });
-        });
-    };
-
     statics(client) {
-        // log(client);
-
         const prom = new Promise((resolve) => resolve(new Files().serve(client)));
         return prom.then(stream => {
-            // log({ 'stream.status': stream.status });
-
-            // if (stream.status === 'failed') {
-            //     // stream.stream = this.callController(client, 'main', 'notFound');
-            // }
-
             return stream;
         }).catch(error_stream => {
             console.log({ 'Error stream': error_stream });
@@ -116,23 +91,13 @@ class Route {
     };
 
     resolve() {
-        // log({ 'this.matching': this.matching });
-
-        log({ 'this.client': this.client });
-
         let par;
         let route = this.routing[this.client.http_method][this.client.name];
-
-        log({ 'this.client.http_method': this.client.http_method });
-        log({ 'this.client.name': this.client.name });
-        log({ 'route': route });
-
-        const renderObj = {};
+        const resolveObj = {};
         if (!route) {
             for (let i = 0; i < this.matching.length; i++) {
                 const rx = this.matching[i];
                 par = this.client.name.match(rx[0]);
-                // log({ 'this.client.req.url': this.client.req.url, 'rx[0]': rx[0], 'par': par });
                 if (par) {
                     par.shift();
                     route = rx[1];
@@ -140,7 +105,6 @@ class Route {
                 }
             }
         }
-        // log({ 'route': route });
         const type = typeof route;
         const renderer = this.types[type];
         if (this.client.mimeType === 'text/html; charset=UTF-8') {
@@ -148,15 +112,15 @@ class Route {
             this.client.controller = arr[1] ? arr[1] : 'main';
             this.client.method = arr[2] ? arr[2] : 'index';
         }
-        renderObj.client = this.client;
 
-        renderObj.route = route;
-        renderObj.renderer = renderer;
-        // log({ 'renderer': renderer });
-        renderObj.intraspectionRendererParams = getFunctionParams(renderer);
-        renderObj.par = par;
-        // log(renderObj.renderer);
-        return renderObj;
+        this.route = route;
+        this.renderer = renderer;
+        // this.intraspectionRenderer = getFunctionParams(renderer);
+        this.par = par;
+
+        // log(this);
+
+        return this;
     };
 }
 

@@ -1,6 +1,6 @@
-const { SERVER_PATH, VIEWS_PATH } = require('../constants.js');
+const { VIEWS_PATH } = require('../constants.js');
 const nunjucks = require('nunjucks');
-// const { log } = require(SERVER_PATH + '/helpers');
+
 
 class Common {
     constructor(client) {
@@ -9,9 +9,22 @@ class Common {
         this.VIEWS_PATH = VIEWS_PATH;
     }
 
-    notFound(text='404 not found') {
+    resolve = data => {
+        return new Promise(resolve => {
+            console.log({ 'resolve(data)': data });
+            resolve(data);
+        });
+    }
+
+    reject = error => {
+        return new Promise(reject => {
+            console.log({ 'reject(error)': error });
+            reject(error);
+        });
+    }
+
+    notFound() {
         this.nunjucks.configure(this.VIEWS_PATH, { autoescape: true });
-        // log({ 'this.client.params': this.client.params });
         const content = this.nunjucks.render('404.html', this.client.params);
         return content;
     }

@@ -15,29 +15,32 @@ const parseHost = (host) => {
 };
 
 class Client {
-    constructor(req, res) {
-        this.req = req;
-        this.res = res;
-        this.host = parseHost(req.headers.host);
+    // param req.headers.host
+    constructor(host) {
+        // this.req = req;
+        // this.res = res;
+        this.host = parseHost(host);
         this.token = undefined;
         this.session = null;
         this.cookie = {};
         this.preparedCookie = [];
-        this.parseCookie();
+        // this.parseCookie();
     }
 
-    static async getInstance(req, res) {
-        const client = new Client(req, res);
-        await Session.restore(client);
-        return client;
-    }
+    // static async getInstance(host {
+    //     const client = new Client(host);
+    //     await Session.restore(client);
+    //     return client;
+    // }
 
     async getCookie() {
         return this.cookie;
     }
 
-    parseCookie() {
-        const { req } = this;
+    parseCookie(req) {
+        // log({ req });
+
+        // const { req } = this;
         const { cookie } = req.headers;
 
         // log({ 'cookie': cookie });
@@ -64,8 +67,8 @@ class Client {
         this.preparedCookie.push(name + COOKIE_DELETE + this.host);
     }
 
-    sendCookie() {
-        const { res, preparedCookie } = this;
+    sendCookie(res) {
+        const { preparedCookie } = this;
         if (preparedCookie.length && !res.headersSent) {
             console.dir({ preparedCookie });
             res.setHeader('Set-Cookie', preparedCookie);

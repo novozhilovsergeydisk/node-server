@@ -12,6 +12,7 @@ const { log, start, end, getFunctionParams } = require('./helpers');
 const mime = require('mime');
 const Files = require('./classes/Files');
 const Route = require('./classes/Route');
+const Client = require('./classes/Client.js');
 const model = require('./classes/Model');
 const { secret } = require('./config.js')
 log({ 'process.cwd': process.cwd() });
@@ -33,6 +34,7 @@ module.exports = {
     logger,
     Files,
     Route,
+    Client,
     asyncLocalStorage,
     APP_PATH,
     CONTROLLERS_PATH,

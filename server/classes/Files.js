@@ -4,12 +4,13 @@ const fs = require('fs');
 const path = require('path');
 const { STATIC_PATH } = require('../../constants.js');
 // const db = require(APP_PATH + '/server/classes/DB');
-// const { log } = require('./helpers');
+const { DTOFactory } = require('../helpers');
 // const mime = require('mime');
+
 
 class Files {
     serve(client) {
-        const { name, file } = client;
+        const { name } = client;
         const filePath = path.join(STATIC_PATH, name);
         return Promise.resolve()
             .then(() => {
@@ -68,6 +69,14 @@ class Files {
         return prom.then(stats => {
             return new Promise(resolve => {
                 stats._file = file;
+
+                const dto = DTOFactory({
+                    status: 'success',
+                    data: { 'file': file },
+                });
+                // log({ dto });
+                // resolve(dto);
+
                 resolve({ state: 'read file', info: 'file ' + file, status: 'success', error: '' });
             });
         }).catch(err => {

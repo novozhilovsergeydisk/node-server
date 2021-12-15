@@ -66,4 +66,23 @@ const getFunctionBody = fn => {
     return trimmedBody;
 };
 
-module.exports = { capitalizeFirstLetter, log, start, end, getFunctionParams, getFunctionParams };
+/**
+ * DTO Factory function.
+ * @param props
+ */
+const DTOFactory = ((props) => {
+    // log({ props });
+
+    if (!props || !props.status || !(props.stream || props.data)) {
+        throw Error('Invalid props param')
+    }
+
+    return {
+        status: props.status,
+        stream: props.stream ? props.stream : null,
+        data: props.data ? props.data : null,
+        ...props
+    }
+});
+
+module.exports = { capitalizeFirstLetter, DTOFactory, log, start, end, getFunctionParams, getFunctionBody };

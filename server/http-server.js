@@ -1,93 +1,6 @@
 'use strict'
 
-const { http, path, secret, log, db, model, Route } = require('./bootstrap.js');
-const Client = require('./classes/Client.js');
-// const { Buffer } = require('buffer');
-const uuid = require('uuid');
-// const { Pool } = require('pg');
-// const Session = require('./classes/Session.js');
-
-// log({ db });
-
-let pg = db.open({
-    user: 'postgres',
-    host: '127.0.0.1',
-    database: 'transplant_net_ru',
-    password: 'postgres_12345',
-    port: 5432
-});
-
-// log( pg.pool );
-
-// const pool = new Pool({
-//     user: 'postgres',
-//     host: '127.0.0.1',
-//     database: 'transplant_net_ru',
-//     password: 'postgres_12345',
-//     port: 5432
-// });
-
-// log({ pool });
-
-// pool.query('SELECT NOW() as now', (err, res) => {
-//     if (err) {
-//         console.log(err.stack)
-//     } else {
-//         console.log(res.rows[0])
-//     }
-// });
-
-// promise
-// const prom = pool
-//     .query(sql, values)
-//     .then(res => console.log(res.rowCount))
-//     .catch(e => console.error({ 'error stack': e.stack }));
-
-let sql = "insert into users values(nextval('users_id_seq'), $1, $2, $3)";
-let values = ['doctor@transplant.' + uuid.v4(), uuid.v4(), false];
-model.query(sql, values).then(data => log({ 'data 1': data }));
-model.query('SELECT NOW() as now').then(data => log({ 'data 2': data }));
-
-const cb = (err, data) => {
-    // log({ data: data, error: err });
-    return { data: data, error: err };
-};
-
-// new Model().save();
-
-// const pass = uuid.v4();
-// const email = 'doctor@transplant.' + uuid.v4();
-
-//pg.query('insert into users values(nextval(\'users_id_seq\'), $1, $2, $3)', [email, pass, false], cb);
-
-// log({ 'new Model().save() ': new Model().save() });
-
-sql = 'account a inner join cab_acct ca on ca.account = a.id and a.is_doc';
-const cursor =
-    pg
-    .select(sql)
-    .where({'ca.cabinet': 59})
-    .fields(['a.name', 'a.email'])
-    // .run()
-    .then(data => log({ 'Model.then(data)': data }));
-
-log({ cursor });
-
-// model = new Model();
-// model
-//     .select('users u')
-//     .fields(['id', 'email', 'password'])
-//     .run()
-//     .then(data => log(data));
-// log({ model });
-
-// model.then(entries => {
-//     log(entries);
-//     log(typeof entries);
-// });
-
-// log(typeof data);
-
+const { http, path, log, Route, Client } = require('./bootstrap.js');
 const MIME_TYPES = {
     html: 'text/html; charset=UTF-8',
     js:   'application/javascript; charset=UTF-8',
@@ -101,36 +14,36 @@ const MIME_TYPES = {
     otf: 'application/x-font-ttf'
 };
 
+const resolve = data => {
+    return new Promise(resolve => {
+        console.log({ 'resolve(data)': data });
+        resolve(data);
+    });
+}
+
+const reject = error => {
+    return new Promise(reject => {
+        console.log({ 'reject(error)': error });
+        reject(error);
+    });
+}
+
 class Server {
     constructor() {};
-    // render = fn => {
-    //     return fn.renderer(fn.route, fn.par, fn.client)
-    // }
 
     execute = client => {
         return Promise.resolve()
             .then(() => {
+                // log({ client });
                 return new Route(client).resolve();
             })
             .then(fn => {
-
                 // log({ 'fn': fn });
-
                 return fn.renderer(fn.route, fn.par, fn.client);
             })
             .then(content => {
-
-                // log({ 'content': content });
-
-                if (content === 'not found') {
-                    content = {};
-                }
-
-                content.data = {
-                    patient: 'Иванов И.И.',
-                    doctor: 'Новожилов С.Ю.'
-                };
-
+                // log({ content });
+                content = (content === 'not found') ? {} : content;
                 return { content: content };
             })
             .catch(err => {
@@ -141,148 +54,45 @@ class Server {
 
     createServer(port, host) {
         const server = http.createServer(async (req, res) => {
-            let client = {}; // { req, res };
-            // log({ 'res': res });
-            if (req.method === 'GET') {
-                try {
-                    const { url } = req;
+            const { url } = req;
+            let client = {};
+            client.http_method = req.method;
+            client.name = url;
+            client.fileExt = path.extname(client.name).substring(1);
+            client.mimeType = MIME_TYPES[client.fileExt] || MIME_TYPES.html;
+            try {
+                this.execute(client).then(entries => {
+                    const content = entries.content['stream'];
+                    if (client.mimeType === 'text/html; charset=UTF-8') {
+                        res.setHeader('Content-Type', client.mimeType);
 
-                    const clientObj = new Client(req, res);
-                    const cookies = clientObj.getCookie();
-
-                    if (cookies instanceof Promise) {
-                        cookies.then(data => {
-                            // log({ 'url': url, 'data': data });
-                        });
-                    }
-
-                    client.http_method = req.method;
-                    client.name = url;
-                    client.fileExt = path.extname(client.name).substring(1);
-                    client.mimeType = MIME_TYPES[client.fileExt] || MIME_TYPES.html;
-
-                    this.execute(client).then(entries => {
-                        const content = entries.content['stream'];
-                        if (client.mimeType === 'text/html; charset=UTF-8') {
-                            res.setHeader('Content-Type', client.mimeType);
-                            if (content === null || content === undefined) {
-                                res.end('404 not found');
-                            } else {
-                                res.end(content);
-                            }
+                        if (content === null || content === undefined) {
+                            res.statusCode = 404;
+                            res.end('404 not found');
                         } else {
-                            if (content instanceof Promise) {
-                                res.setHeader('Content-Type', client.mimeType);
-                                // log({ 'content instanceof Promise': content instanceof Promise });
-                                // log({ 'client.mimeType': client.mimeType, 'entries': entries });
-                                content.then(stream => {
-                                    // log({ 'stream': stream });
-                                    // return stream;
-                                    if (stream) {
-                                        res.setHeader('Content-Type', client.mimeType);
-                                        // log({ 'stream@': client.req.url });
-                                        // console.log({ 'stream': stream });
-                                        stream.pipe(res);
-                                        // res.end();
-                                    }
-                                }).catch(error_stream => {
-                                    console.log({ 'Error stream in send': error_stream });
-                                });
-                            } else {
-                                res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-                                res.write('<h3>404 not found!</h3>');
-                                res.end('<h5>' + client.mimeType + '</h5>');
-                                // log({ 'content instanceof Promise': content instanceof Promise });
-                            }
+                            const html = ((typeof content) ==='string' ) ? content : content.toString();
+                            res.statusCode = 200;
+                            res.end(html);
                         }
-                        // Aux.send(entries, client);
-                    });
-                } catch(err) {
-                    log({ 'Error while execute()': err });
-                }
-            }
-            if (req.method === 'POST') {
-                try {
-                    const { url } = req;
-
-                    const clientObj = new Client(req, res);
-                    const cookies = clientObj.getCookie();
-
-                    if (cookies instanceof Promise) {
-                        cookies.then(data => {
-                            // log({ 'url': url, 'data': data });
-                        });
-                    }
-
-                    client.http_method = req.method;
-                    client.name = url;
-                    client.fileExt = path.extname(client.name).substring(1);
-                    client.mimeType = MIME_TYPES[client.fileExt] || MIME_TYPES.html;
-
-                    this.execute(client).then(entries => {
-                        const content = entries.content['stream'];
-
-                        // log({ 'entries': entries });
-
-                        if (client.mimeType === 'text/html; charset=UTF-8') {
+                    } else {
+                        if (content instanceof Promise) {
                             res.setHeader('Content-Type', client.mimeType);
-                            if (content === null || content === undefined) {
-                                res.end('404 not found');
-                            } else {
-                                res.end(content);
-                            }
+                            content.then(stream => {
+                                if (stream) {
+                                    res.setHeader('Content-Type', client.mimeType);
+                                    stream.pipe(res);
+                                }
+                            }).catch(error_stream => {
+                                console.log({ 'Error stream in send': error_stream });
+                            });
                         } else {
-                            if (content instanceof Promise) {
-                                res.setHeader('Content-Type', client.mimeType);
-                                // log({ 'content instanceof Promise': content instanceof Promise });
-                                // log({ 'client.mimeType': client.mimeType, 'entries': entries });
-                                content.then(stream => {
-                                    // log({ 'stream': stream });
-                                    // return stream;
-                                    if (stream) {
-                                        res.setHeader('Content-Type', client.mimeType);
-                                        // log({ 'stream@': client.req.url });
-                                        // console.log({ 'stream': stream });
-                                        stream.pipe(res);
-                                        // res.end();
-                                    }
-                                }).catch(error_stream => {
-                                    console.log({ 'Error stream in send': error_stream });
-                                });
-                            } else {
-                                res.setHeader('Content-Type', 'text/html; charset=UTF-8');
-                                res.write('<h3>404 not found!</h3>');
-                                res.end('<h5>' + client.mimeType + '</h5>');
-                                // log({ 'content instanceof Promise': content instanceof Promise });
-                            }
+                            res.setHeader('Content-Type', 'text/html; charset=UTF-8');
+                            res.end('<h3>404 not found!</h3>');
                         }
-                        // Aux.send(entries, client);
-                    });
-                } catch(err) {
-                    log({ 'Error while execute()': err });
-                }
-
-                // if (!findRoute) {
-                //     this.notFound(client);
-                // } else {
-                //     let body = '';
-                //
-                //     req.on('data', function(chunk) {
-                //         // console.log({ 'chunk': chunk });
-                //
-                //         body += chunk.toString();
-                //
-                //         controller.call(client, findRoute.handler, findRoute.action, body);
-                //
-                //     });
-                //
-                //     // console.log({ 'body out': body });
-                //
-                //     // ControllerMethodCall(res, findRoute.handler, findRoute.action, body);
-                // }
-            }
-            if (req.method === 'PUT') {
-                mainController.success(res, 'put');
+                    }
+                });
+            } catch(err) {
+                log({ 'Error while execute()': err });
             }
             req.on('end', function() {
                 // console.log('end');

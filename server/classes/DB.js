@@ -66,10 +66,17 @@ class Cursor {
     }
 
     resolve(result) {
-        const { rows, fields, rowCount } = result;
-        this.rows = rows;
-        this.cols = fields;
-        this.rowCount = rowCount;
+        try {
+            const { rows, fields, rowCount } = result;
+            this.rows = rows;
+            this.cols = fields;
+            this.rowCount = rowCount;
+        } catch(e) {
+            log({ 'error resolve(result)': e });
+            this.rows = 0;
+            this.cols = 0;
+            this.rowCount = 0;
+        }
     }
 
     where(conditions) {
@@ -123,9 +130,9 @@ class Cursor {
         if (orderBy) sql += ` ORDER BY ${orderBy}`;
 
         this.database.query(sql, args,  (err, res) => {
-            // start();
-            // log({ sql, args, callback });
-            // end();
+            start();
+            log({ sql, args, callback });
+            end();
 
             // if (err) {
             //     console.log({ 'sql': sql, 'err': err });
@@ -172,7 +179,7 @@ class Database {
         }
         const startTime = new Date().getTime();
 
-        log({ callback });
+        // log({ callback });
 
         this.pool.query(sql, values, (err, res) => {
             // start();
