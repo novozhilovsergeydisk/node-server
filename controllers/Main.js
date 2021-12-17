@@ -52,7 +52,7 @@ class Main extends commonController {
         }
     }
 
-    registration() {
+    register() {
         try {
             const cursor = userService.registration('doctor@transplant.3558aa3b-72d6-4244-a984-b280db2e4969');
             return cursor.then(data => {

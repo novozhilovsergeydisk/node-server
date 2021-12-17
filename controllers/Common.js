@@ -11,14 +11,14 @@ class Common {
 
     resolve = data => {
         return new Promise(resolve => {
-            console.log({ 'resolve(data)': data });
+            // console.log({ 'resolve(data)': data });
             resolve(data);
         });
     }
 
     reject = error => {
         return new Promise(reject => {
-            console.log({ 'reject(error)': error });
+            // console.log({ 'reject(error)': error });
             reject(error);
         });
     }

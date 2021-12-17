@@ -1,6 +1,6 @@
 'use strict'
 
-const { http, path, log, Route, Client } = require('./bootstrap.js');
+const { http, path, log, end, Route, Client } = require('./bootstrap.js');
 const MIME_TYPES = {
     html: 'text/html; charset=UTF-8',
     js:   'application/javascript; charset=UTF-8',
@@ -19,14 +19,14 @@ const resolve = data => {
         console.log({ 'resolve(data)': data });
         resolve(data);
     });
-}
+};
 
 const reject = error => {
     return new Promise(reject => {
         console.log({ 'reject(error)': error });
         reject(error);
     });
-}
+};
 
 class Server {
     constructor() {};
@@ -34,16 +34,22 @@ class Server {
     execute = client => {
         return Promise.resolve()
             .then(() => {
-                // log({ client });
-                return new Route(client).resolve();
+                const resolve = new Route(client).resolve();
+                log({ resolve });
+
+                // if () {
+                //
+                // }
+
+                return resolve;
             })
-            .then(fn => {
-                // log({ 'fn': fn });
-                return fn.renderer(fn.route, fn.par, fn.client);
-            })
+            // .then(routeObj => {
+            //     log({ 'routeObj': routeObj });
+            //     return routeObj.renderer(routeObj.route, routeObj.par, routeObj.client);
+            // })
             .then(content => {
-                // log({ content });
-                content = (content === 'not found') ? {} : content;
+                log({ content });
+                // content = (content === 'not found') ? {} : content;
                 return { content: content };
             })
             .catch(err => {
@@ -62,6 +68,10 @@ class Server {
             client.mimeType = MIME_TYPES[client.fileExt] || MIME_TYPES.html;
             try {
                 this.execute(client).then(entries => {
+
+                    log({ entries });
+                    end();
+
                     const content = entries.content['stream'];
                     if (client.mimeType === 'text/html; charset=UTF-8') {
                         res.setHeader('Content-Type', client.mimeType);

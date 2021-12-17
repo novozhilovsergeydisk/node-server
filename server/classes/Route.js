@@ -5,6 +5,7 @@ const { asyncLocalStorage } = require(APP_PATH + '/server/classes/Logger');
 const Files = require(APP_PATH + '/server/classes/Files');
 const { DTOFactory, log, getFunctionParams, capitalizeFirstLetter } = require('../helpers');
 const controller = require(CONTROLLERS_PATH + 'Controller');
+const { patientControllers, staticController } = require('../controllers/patients.js');
 
 const user = { patient: 'Новожилов Сергей', age: 57 };
 
@@ -35,24 +36,23 @@ const handler = (client, controllerName='main', action='index', data=null, roles
     });
 };
 
-
 class Route {
     routing = {
         'GET': {
             '/': (client, par) => handler(client, 'main', 'index', par, {roles: ['user']}),
-            '/index': (client, par) => handler(client, 'main', 'index', par, {roles: ['user', 'admin']}),
-            '/contacts': (client, par) => handler(client, 'main', 'contacts', par, {roles: ['user', 'admin']}),
+            '/index': patientControllers.getAllPatients,
+            '/patient/id/*': patientControllers.getPatient,
             '/index/*': (client, par) => handler(client, 'main', 'index', par, { roles: ['user', 'admin'] }),
             '/api/activate/*': (client, par) => handler(client, 'main', 'activate', par, {roles: ['admin']}),
             '/api/refresh': (client, par) => handler(client, 'main', 'refresh', par, {roles: ['admin']}),
             '/users': (client, par) => handler(client, 'main', 'users', par, {roles: ['admin']}),
             '/user/patient': () => user.patient,
             '/user/doctor': (client, par) => 'parameter=' + par[0],
-            '/*': (client, par) => this.statics(client, par),
-            '/registration': (client, par) => handler(client, 'main', 'registration', par, {roles: ['user']})
+            '/*': staticController.staticContent,
+            '/register': (client, par) => handler(client, 'main', 'register', par, {roles: ['user']})
         },
         'POST': {
-            '/registration': (client, par) => handler(client, 'main', 'registration', par, {roles: ['admin']}),
+            '/register': (client, par) => handler(client, 'main', 'registration', par, {roles: ['admin']}),
             '/login': (client, par) => handler(client, 'main', 'login', par, {roles: ['admin']}),
             '/logut': (client, par) => handler(client, 'main', 'logout', par, {roles: ['admin']})
         }
@@ -92,18 +92,45 @@ class Route {
 
     resolve() {
         let par;
-        let route = this.routing[this.client.http_method][this.client.name];
-        const resolveObj = {};
+        const name = this.client.name;
+        const http_method = this.client.http_method;
+        let route = this.routing[http_method][name];
         if (!route) {
             for (let i = 0; i < this.matching.length; i++) {
+
                 const rx = this.matching[i];
-                par = this.client.name.match(rx[0]);
+
+                // log({ rx });
+
+                const url = this.client.name;
+
+                par = url.match(rx[0]);
+
                 if (par) {
-                    par.shift();
+                    // log({ name });
+
+                    const parArr = url.split('/');
+
+                    if (parArr.length > 1) {
+                        const name = parArr[parArr.length - 2];
+                        const value = parArr[parArr.length - 1];
+                        par = { name: name, value: value };
+
+                        // log({ par });
+                    }
+
+                    // par.shift();
+
                     route = rx[1];
+
+                    // log({ 'rx[1]': rx[1] });
+                    // log({ 'rx[1]': rx[1], 'par': par });
+
                     break;
                 }
             }
+
+            // par.
         }
         const type = typeof route;
         const renderer = this.types[type];
@@ -118,9 +145,11 @@ class Route {
         // this.intraspectionRenderer = getFunctionParams(renderer);
         this.par = par;
 
-        // log(this);
+        // log({ 'this': this });
 
-        return this;
+        return this.renderer(this.route, this.par, this.client);
+
+        // return this;
     };
 }
 

@@ -1,3 +1,7 @@
+// const serializeTypes = require('./helpers/serialization.js');
+//
+// console.log(serializeTypes['object']);
+
 const capitalizeFirstLetter = (string) => {
     if (typeof string !== 'string') {
         return '';
@@ -71,18 +75,36 @@ const getFunctionBody = fn => {
  * @param props
  */
 const DTOFactory = ((props) => {
-    // log({ props });
+    log({ props });
 
-    if (!props || !props.status || !(props.stream || props.data)) {
+    if (!props) {
         throw Error('Invalid props param')
     }
 
     return {
-        status: props.status,
+        status: props.status ? props.status : 'success',
         stream: props.stream ? props.stream : null,
+        error: props.error ? props.error : 'undefined',
         data: props.data ? props.data : null,
         ...props
     }
 });
+
+const promice = (data) => {
+    return new Promise((resolve, reject) => {
+        try {
+
+            // log({ data });
+            // log(typeof data);
+            // log({ par });
+            const renderer = serializeTypes[typeof data];
+            log({ renderer });
+
+            resolve(renderer);
+        } catch(e) {
+            reject(e);
+        }
+    });
+}
 
 module.exports = { capitalizeFirstLetter, DTOFactory, log, start, end, getFunctionParams, getFunctionBody };
