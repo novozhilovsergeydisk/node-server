@@ -16,7 +16,7 @@ const parseHost = (host) => {
 
 class Client {
     // param req.headers.host
-    constructor(host) {
+    constructor(host, http_method, url, fileExt, mimeType ) {
         // this.req = req;
         // this.res = res;
         this.host = parseHost(host);
@@ -24,6 +24,12 @@ class Client {
         this.session = null;
         this.cookie = {};
         this.preparedCookie = [];
+
+        this.http_method = http_method;
+        this.name = url;
+        this.fileExt = fileExt;
+        this.mimeType = mimeType;
+
         // this.parseCookie();
     }
 

@@ -75,19 +75,22 @@ const getFunctionBody = fn => {
  * @param props
  */
 const DTOFactory = ((props) => {
-    log({ props });
+    // log({ props });
 
     if (!props) {
         throw Error('Invalid props param')
     }
 
-    return {
+    const ret = {
         status: props.status ? props.status : 'success',
         stream: props.stream ? props.stream : null,
         error: props.error ? props.error : 'undefined',
-        data: props.data ? props.data : null,
         ...props
-    }
+    };
+
+    // log({ 'props': props, 'ret': ret });
+
+    return ret;
 });
 
 const promice = (data) => {
