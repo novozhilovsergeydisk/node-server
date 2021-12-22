@@ -1,40 +1,18 @@
 'use strict'
 
-const { APP_PATH, CONTROLLERS_PATH } = require('../../constants.js');
-const { asyncLocalStorage } = require(APP_PATH + '/server/classes/Logger');
-// const Files = require(APP_PATH + '/server/classes/Files');
-const { DTOFactory, log, capitalizeFirstLetter } = require('../helpers');
-const controller = require(CONTROLLERS_PATH + 'Controller');
-const { patientControllers, staticController } = require('../controllers/patients.js');
+const { SERVER_PATH } = require('../../constants.js');
 
-const user = { patient: 'Новожилов Сергей', age: 57 };
+const { asyncLocalStorage } = require(SERVER_PATH + '/lib/Logger');
+const { DTOFactory, capitalizeFirstLetter, log } = require(SERVER_PATH + '/helpers');
+const { controller } = require(SERVER_PATH + '/controllers/Controller.js');
+const { patientController, staticController } = require('../controllers/patients.js');
+const { Auth } = require(SERVER_PATH + '/lib/auth.js');
 
-const handler = (client, controllerName='main', action='index', data=null, roles=null) => {
-    action = (client.action) ? client.action : action;
-    const handlerPromise = new Promise((resolve) => {
-        resolve(controller.call(client, controllerName, action, data));
-    });
-    return handlerPromise.then(data => {
-        const entries = DTOFactory({
-            info: 'Call controller ' + capitalizeFirstLetter(controllerName),
-            status: 'success',
-            stream: data,
-        });
-        return new Promise(resolve => {
-            resolve(entries);
-        });
-    }).catch(err => {
-        const entries = DTOFactory({
-            info: 'Call controller ' + capitalizeFirstLetter(controllerName),
-            status: 'failed',
-            error: err,
-            stream: null,
-        });
-        return new Promise(reject => {
-            reject(entries);
-        });
-    });
-};
+// const user = { patient: 'Новожилов Сергей', age: 57 };
+
+const auth = new Auth();
+
+// log({ patientController });
 
 class Route {
     constructor(client) {
@@ -50,17 +28,17 @@ class Route {
 
         this.routing = {
             'GET': {
-                '/': (client, par) => handler(client, 'main', 'index', par, {roles: ['user']}),
-                '/index': patientControllers.getAllPatients,
-                '/index/*': patientControllers.getAllPatients,
-                '/patient/id/*': patientControllers.getPatient,
-                '/api/activate/*': (client, par) => handler(client, 'main', 'activate', par, {roles: ['admin']}),
-                '/api/refresh': (client, par) => handler(client, 'main', 'refresh', par, {roles: ['admin']}),
+                '/': patientController.main,
+                '/index': patientController.getAllPatients,
+                '/index/*': patientController.getAllPatients,
+                '/patient/id/*': patientController.getPatient,
+                '/api/activate/*': auth.activate,
+                '/api/refresh': auth.refresh,
                 '/*': staticController.staticContent,
                 '/css/*': staticController.staticContent,
                 '/js/*': staticController.staticContent,
                 '/images/*': staticController.staticContent,
-                '/register': patientControllers.register
+                '/register': patientController.register
             },
             'POST': {
                 '/register': (client, par) => handler(client, 'main', 'registration', par, {roles: ['admin']}),
@@ -78,13 +56,20 @@ class Route {
                 delete this.routing[client.http_method][key];
             }
         }
-    };
+    }
+
+    test() {
+        log('test');
+    }
 
     resolve() {
         let par;
         const name = this.client.name;
         const http_method = this.client.http_method;
         let route = this.routing[http_method][name];
+
+        // log( this.client );
+
         if (!route) {
             for (let i = 0; i < this.matching.length; i++) {
                 par = null;
@@ -113,9 +98,15 @@ class Route {
         this.route = route;
         this.renderer = renderer;
         this.par = par;
+
+        log(this);
+
         const ret = this.renderer(this.route, this.par, this.client);
+
+        log({ ret });
+
         return ret;
-    };
+    }
 }
 
 module.exports = Route;

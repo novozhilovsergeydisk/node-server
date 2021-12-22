@@ -2,7 +2,7 @@ class Base {
     constructor(res) {
         this.res = res;
         this.nunjucks = require('nunjucks');
-        this.constants = require('../constants');
+        this.constants = require('../../constants');
     }
 
     write(data) {

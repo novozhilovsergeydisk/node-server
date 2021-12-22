@@ -1,6 +1,6 @@
-const path = require('path');
-const { CONTROLLERS_PATH, SERVER_PATH } = require(path.resolve(__dirname, '../constants.js'));
-const { capitalizeFirstLetter, log } = require(SERVER_PATH + '/helpers');
+const { CONTROLLERS_PATH, SERVER_PATH } = require('../../constants.js');
+console.log({ 'SERVER_PATH': SERVER_PATH });
+const { capitalizeFirstLetter, log } = require(SERVER_PATH + '/helpers.js');
 
 class Controller {
     constructor() {}

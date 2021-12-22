@@ -1,18 +1,28 @@
-select * from current_catalog;
+select * from current_catalog
+;
 
 DROP TABLE public.user_roles;
 DROP TABLE public.roles;
-DROP TABLE public.users;
 DROP TABLE public.user_profile;
+DROP TABLE public.token;
+DROP TABLE public.users;
 
 CREATE TABLE public.users (
 	id serial NOT NULL,
-	email varchar(25) NOT NULL,
-	password varchar(25) NOT NULL,
-	is_activate boolean DEFAULT false,
-	refresh_token varchar(50) DEFAULT NULL,
+	email varchar(100) NOT NULL,
+	password varchar(100) NOT NULL,
+	isActivated boolean DEFAULT false,
+	activationLink varchar(100) DEFAULT NULL,
 	CONSTRAINT users_pkey PRIMARY KEY (id),
-	CONSTRAINT user_profile_email_key UNIQUE (email)
+	CONSTRAINT users_email_key UNIQUE (email)
+);
+
+CREATE TABLE public.token (
+	id serial NOT NULL,
+	user_id int4 NOT NULL,
+	refreshToken varchar(50) NOT NULL,
+	CONSTRAINT token_pkey PRIMARY KEY (id),
+	CONSTRAINT token_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
 
 CREATE TABLE public.roles (
@@ -38,3 +48,12 @@ CREATE TABLE public.user_profile (
 	CONSTRAINT user_profile_pkey PRIMARY KEY (id),
 	CONSTRAINT user_profile_user_id_fkey FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );
+
+--
+
+
+insert into users values(nextval('users_id_seq'), 'sergey3@mail.ru', 'sds5465465@ddcd__', false)
+;
+
+select nextval('users_id_seq')
+;

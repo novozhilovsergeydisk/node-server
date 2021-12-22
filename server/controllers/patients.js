@@ -3,8 +3,11 @@ const fs = require('fs');
 const { DTOFactory, log } = require('../helpers.js');
 const { VIEWS_PATH, STATIC_PATH } = require('../../constants.js');
 const nunjucks = require('nunjucks');
+const userService = require('../service/user-service.js')
 
-// log({ VIEWS_PATH });
+// const userService = new UserService();
+
+log({ userService });
 
 nunjucks.configure(VIEWS_PATH, { autoescape: true });
 
@@ -25,20 +28,37 @@ let patients = [
 ];
 
 // Handlers
-const patientControllers = {
-    refresh: async () => {
+class patientControllers {
+    async main() {
+        return DTOFactory({ stream: 'main' });
+    }
+    async refresh() {
         return DTOFactory({ stream: 'refresh' });
-    },
-    activate: async () => {
+    }
+    async activate() {
         return DTOFactory({ stream: 'activate' });
-    },
-    register: async () => {
-        return DTOFactory({ stream: nunjucks.render('register/index.html', patients) });
-    },
-    getAllPatients: async () => {
-        return DTOFactory({ stream: nunjucks.render('index.html', patients) });
-    },
-    getPatient: async (req, par) => {
+    }
+    async register() {
+        try {
+            // const userService = new UserService();
+            //
+            // log({ userService });
+
+            return DTOFactory({ stream: nunjucks.render('register/index.html', patients) });
+        } catch(e) {
+
+        }
+    }
+    async getAllPatients() {
+        const dto = DTOFactory({ stream: nunjucks.render('index.html', patients) });
+
+        // const dto = DTOFactory({ stream: { 'VIEWS_PATH': VIEWS_PATH } });
+
+        log({ dto });
+
+        return dto;
+    }
+    async getPatient(req, par) {
         log({ 'req.params': req.params });
         const id = Number(par.value); //Number(req.params.id); // blog ID
         // log(typeof id);
@@ -57,8 +77,8 @@ const patientControllers = {
         return dto;
 
         // return patient;
-    },
-    addPatient: async (req, reply) => {
+    }
+    async addPatient(req, reply) {
         const id = patients.length + 1; // generate new ID
         // return { foo: 'bar' };
         console.log({ id });
@@ -70,8 +90,8 @@ const patientControllers = {
         patients.push(newPatient);
 
         return newPatient;
-    },
-    updatePatient: async (req, reply) => {
+    }
+    async updatePatient(req, reply) {
         const id = Number(req.params.id)
         patients = patients.map(patient => {
             if (patient.id === id) {
@@ -85,13 +105,13 @@ const patientControllers = {
             id,
             fio: req.body.fio
         };
-    },
-    deletePatient: async (req, reply) => {
+    }
+    async deletePatient(req, reply) {
         const id = Number(req.params.id);
         patients = patients.filter(patient => patient.id !== id);
         return { msg: `Patient with ID ${id} is deleted` };
     }
-};
+}
 
 const existFile = (file) => {
     const filePromice = new Promise((resolve, reject) => {
@@ -167,4 +187,6 @@ const staticController = {
     }
 };
 
-module.exports = { patients, patientControllers, staticController };
+const patientController = new patientControllers();
+
+module.exports = { patients, patientController, staticController };

@@ -1,7 +1,7 @@
 'use strict'
 
-const { http, path, log, end, Route, Client } = require('./bootstrap.js');
-const { auth, user, admin, Car } = require('./classes/auth.js');
+const { http, path, log, Route, Client } = require('./bootstrap.js');
+// const { Auth } = require('./lib/auth.js');
 const MIME_TYPES = {
     html: 'text/html; charset=UTF-8',
     js:   'application/javascript; charset=UTF-8',
@@ -15,19 +15,11 @@ const MIME_TYPES = {
     otf: 'application/x-font-ttf'
 };
 
-const tesla = new Car('Tesla', 'silver');
-log({ tesla });
+// const auth = new Auth();
 
-// user.fullName = 'Новожилов Сергей';
-// const isAuth = auth.login();
-// log({ isAuth });
+// const route = new Route();
 
-// alert(admin.fullName); // John Smith (*)
-//
-// // срабатывает сеттер!
-// admin.fullName = "Alice Cooper"; // (**)
-// alert(admin.name); // Alice
-// alert(admin.surname); // Cooper
+// log({ Route });
 
 console.table([{doctor: 'Новожилов С.Ю.'}, {patient: 'Иванов Т.Ф.', sys: 143, dia: 89, pulse: 54, glukose: 5.9}, {patient: 'Петров А.М.', sys: 133, dia: 79, pulse: 64}, {patient: 'Сидоров А.М.', sys: 123, dia: 69, pulse: 74}]);
 
@@ -75,6 +67,8 @@ class Server {
                 // const isAuth = auth.login();
                 // log({ isAuth });
 
+                // log({ data });
+
                 return data;
             })
             .catch(err => {
@@ -87,16 +81,25 @@ class Server {
 
         // log({ content });
 
+        // content.then(data => {
+        //     log({ data });
+        // })
+
         if (client.mimeType === 'text/html; charset=UTF-8') {
             if (content === null || content === undefined) {
                 __404(client, res);
             } else {
                 if (content instanceof Promise) {
                     content.then(data => {
+                        // log({ data });
+
                         if (data === null) __404(client, res);
                     });
                 } else {
                     const html = ((typeof content) ==='string' ) ? content : content.toString();
+
+                    log({ 'client.name': client.name });
+
                     send(client.mimeType, html, res);
                 }
             }

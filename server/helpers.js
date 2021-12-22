@@ -84,7 +84,7 @@ const DTOFactory = ((props) => {
     const ret = {
         status: props.status ? props.status : 'success',
         stream: props.stream ? props.stream : null,
-        error: props.error ? props.error : 'undefined',
+        error: props.error ? props.error : undefined,
         ...props
     };
 

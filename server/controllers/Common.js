@@ -1,4 +1,4 @@
-const { VIEWS_PATH } = require('../constants.js');
+const { VIEWS_PATH } = require('../../constants.js');
 const nunjucks = require('nunjucks');
 
 

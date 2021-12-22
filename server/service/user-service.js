@@ -1,9 +1,9 @@
 // const UserModel = require('../models/user-model');
-const model = require('../classes/Model.js');
+const model = require('../lib/Model.js');
 const bcrypt = require('bcrypt');
 const uuid = require('uuid');
 const mailService = require('./mail-service.js');
-const db = require('../classes/DB.js');
+const db = require('../lib/DB.js');
 const { DTOFactory, log } = require('../helpers');
 
 let pg = db.open({
@@ -15,19 +15,23 @@ let pg = db.open({
 });
 
 class UserService {
+    constructor() {}
+
     registration(email, password) {
-        return new Promise((resolve) => {
+        const candidate = new Promise((resolve) => {
             const sql = 'users u';
             pg
                 .select(sql)
                 .where({'email': email})
                 .fields(['u.id, u.email'])
-                .then(candidate => {
-                    // log({ candidate });
+                .then(data => {
+                    log({ data });
 
-                    resolve(candidate);
+                    resolve(data);
                 });
         });
+
+        return candidate;
         // model.query(sql, values).then(data => log({ 'data 1': data }));
         // model.query('SELECT NOW() as now').then(data => log({ 'data 2': data }));
     }
