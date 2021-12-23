@@ -26,9 +26,11 @@ class Client {
         this.preparedCookie = [];
 
         this.http_method = http_method;
-        this.name = url;
+        this.url = url;
         this.fileExt = fileExt;
         this.mimeType = mimeType;
+
+        // log({ 'url = ': url });
 
         // this.parseCookie();
     }

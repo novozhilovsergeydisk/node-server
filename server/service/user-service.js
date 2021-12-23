@@ -6,7 +6,7 @@ const mailService = require('./mail-service.js');
 const db = require('../lib/DB.js');
 const { DTOFactory, log } = require('../helpers');
 
-let pg = db.open({
+const pg = db.open({
     user: 'postgres',
     host: '127.0.0.1',
     database: 'transplant_net_ru',
@@ -16,6 +16,35 @@ let pg = db.open({
 
 class UserService {
     constructor() {}
+
+    cabinet(client) {
+        log({ 'client.url': client.url });
+
+        // const parName = client.par.name;
+        //
+        // if (parName === 'id') {
+        //
+        // }
+
+        //userService.cabinet(59);
+        return DTOFactory({stream: 'cabinetControllers'});
+
+        // const cabinetList = new Promise((resolve) => {
+        //     const sql = 'cabinet c';
+        //     pg
+        //         .select(sql)
+        //         .where({'id': id})
+        //         // .fields(['u.id, u.email'])
+        //         .order('id')
+        //         .then(data => {
+        //             log({ data });
+        //
+        //             resolve(data);
+        //         });
+        // });
+        //
+        // return cabinetList;
+    }
 
     registration(email, password) {
         const candidate = new Promise((resolve) => {

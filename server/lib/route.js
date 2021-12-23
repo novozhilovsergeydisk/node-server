@@ -6,13 +6,14 @@ const { asyncLocalStorage } = require(SERVER_PATH + '/lib/Logger');
 const { DTOFactory, capitalizeFirstLetter, log } = require(SERVER_PATH + '/helpers');
 const { controller } = require(SERVER_PATH + '/controllers/Controller.js');
 const { patientController, staticController } = require('../controllers/patients.js');
+const cabinetControllers = require('../controllers/cabinet.js');
 const { Auth } = require(SERVER_PATH + '/lib/auth.js');
 
 // const user = { patient: 'Новожилов Сергей', age: 57 };
 
 const auth = new Auth();
 
-// log({ patientController });
+// log( typeof cabinetControllers );
 
 class Route {
     constructor(client) {
@@ -34,11 +35,12 @@ class Route {
                 '/patient/id/*': patientController.getPatient,
                 '/api/activate/*': auth.activate,
                 '/api/refresh': auth.refresh,
-                '/*': staticController.staticContent,
+                '/api/cabinet/id/*': cabinetControllers.cabinet,
                 '/css/*': staticController.staticContent,
                 '/js/*': staticController.staticContent,
                 '/images/*': staticController.staticContent,
-                '/register': patientController.register
+                '/register': patientController.register,
+                '/favicon.ico': staticController.staticContent
             },
             'POST': {
                 '/register': (client, par) => handler(client, 'main', 'registration', par, {roles: ['admin']}),
@@ -64,9 +66,9 @@ class Route {
 
     resolve() {
         let par;
-        const name = this.client.name;
+        // let url = this.client.url;
         const http_method = this.client.http_method;
-        let route = this.routing[http_method][name];
+        let route = this.routing[http_method][this.client.url];
 
         // log( this.client );
 
@@ -74,7 +76,7 @@ class Route {
             for (let i = 0; i < this.matching.length; i++) {
                 par = null;
                 const rx = this.matching[i];
-                const url = this.client.name;
+                const url = this.client.url;
                 par = url.match(rx[0]);
                 if (par) {
                     const parArr = url.split('/');
@@ -91,143 +93,32 @@ class Route {
         const type = typeof route;
         const renderer = this.types[type];
         if (this.client.mimeType === 'text/html; charset=UTF-8') {
-            const arr = this.client.name.split('/');
+            const arr = this.client.url.split('/');
             this.client.controller = arr[1] ? arr[1] : 'main';
             this.client.method = arr[2] ? arr[2] : 'index';
         }
         this.route = route;
         this.renderer = renderer;
+        this.client.par = par;
         this.par = par;
 
-        log(this);
+        // log(this);
+
+        // log({ route });
+
+        // log({ renderer });
+
+        // log(this.par);
 
         const ret = this.renderer(this.route, this.par, this.client);
 
-        log({ ret });
+        // log({ ret });
 
         return ret;
     }
 }
 
 module.exports = Route;
-
-// 'use strict';
-
-// var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol ? "symbol" : typeof obj; };
-//
-// var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-//
-// function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-//
-// var Route = function () {
-//     function Route(client) {
-//         _classCallCheck(this, Route);
-//
-//         this.matching = [];
-//
-//         this.types = {
-//             object: JSON.stringify,
-//             string: function string(s) {
-//                 return s;
-//             },
-//             number: function number(n) {
-//                 return n + '';
-//             },
-//             undefined: function undefined() {
-//                 return { status: '404 not found' };
-//             },
-//             function: function _function(fn, par, client) {
-//                 return fn(client, par);
-//             }
-//         };
-//
-//         this.routing = {
-//             'GET': {
-//                 '/': function _(client, par) {
-//                     return handler(client, 'main', 'index', par, { roles: ['user'] });
-//                 },
-//                 '/index': patientControllers.getAllPatients,
-//                 '/index/*': patientControllers.getAllPatients,
-//                 '/patient/id/*': patientControllers.getPatient,
-//                 '/api/activate/*': function apiActivate(client, par) {
-//                     return handler(client, 'main', 'activate', par, { roles: ['admin'] });
-//                 },
-//                 '/api/refresh': function apiRefresh(client, par) {
-//                     return handler(client, 'main', 'refresh', par, { roles: ['admin'] });
-//                 },
-//                 '/*': staticController.staticContent,
-//                 '/css/*': staticController.staticContent,
-//                 '/js/*': staticController.staticContent,
-//                 '/images/*': staticController.staticContent,
-//                 '/register': patientControllers.register
-//             },
-//             'POST': {
-//                 '/register': function register(client, par) {
-//                     return handler(client, 'main', 'registration', par, { roles: ['admin'] });
-//                 },
-//                 '/login': function login(client, par) {
-//                     return handler(client, 'main', 'login', par, { roles: ['admin'] });
-//                 },
-//                 '/logut': function logut(client, par) {
-//                     return handler(client, 'main', 'logout', par, { roles: ['admin'] });
-//                 }
-//             }
-//         };
-//
-//         this.client = client;
-//         for (var key in this.routing[client.http_method]) {
-//             if (key.includes('*')) {
-//                 var rx = new RegExp('^' + key.replace('*', '(.*)'));
-//                 var route = this.routing[client.http_method][key];
-//                 this.matching.push([rx, route]);
-//                 delete this.routing[client.http_method][key];
-//             }
-//         }
-//     }
-//
-//     _createClass(Route, [{
-//         key: 'resolve',
-//         value: function resolve() {
-//             var par = void 0;
-//             var name = this.client.name;
-//             var http_method = this.client.http_method;
-//             var route = this.routing[http_method][name];
-//             if (!route) {
-//                 for (var i = 0; i < this.matching.length; i++) {
-//                     par = null;
-//                     var rx = this.matching[i];
-//                     var url = this.client.name;
-//                     par = url.match(rx[0]);
-//                     if (par) {
-//                         var parArr = url.split('/');
-//                         if (parArr.length > 1) {
-//                             var _name = parArr[parArr.length - 2];
-//                             var value = parArr[parArr.length - 1];
-//                             par = { name: _name, value: value };
-//                         }
-//                         route = rx[1];
-//                         break;
-//                     }
-//                 }
-//             }
-//             var type = typeof route === 'undefined' ? 'undefined' : _typeof(route);
-//             var renderer = this.types[type];
-//             if (this.client.mimeType === 'text/html; charset=UTF-8') {
-//                 var arr = this.client.name.split('/');
-//                 this.client.controller = arr[1] ? arr[1] : 'main';
-//                 this.client.method = arr[2] ? arr[2] : 'index';
-//             }
-//             this.route = route;
-//             this.renderer = renderer;
-//             this.par = par;
-//             var ret = this.renderer(this.route, this.par, this.client);
-//             return ret;
-//         }
-//     }]);
-//
-//     return Route;
-// }();
-
 
 
 // const routes = [

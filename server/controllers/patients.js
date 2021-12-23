@@ -3,7 +3,7 @@ const fs = require('fs');
 const { DTOFactory, log } = require('../helpers.js');
 const { VIEWS_PATH, STATIC_PATH } = require('../../constants.js');
 const nunjucks = require('nunjucks');
-const userService = require('../service/user-service.js')
+const userService = require('../service/user-service.js');
 
 // const userService = new UserService();
 
@@ -51,34 +51,22 @@ class patientControllers {
     }
     async getAllPatients() {
         const dto = DTOFactory({ stream: nunjucks.render('index.html', patients) });
-
         // const dto = DTOFactory({ stream: { 'VIEWS_PATH': VIEWS_PATH } });
-
         log({ dto });
-
         return dto;
     }
-    async getPatient(req, par) {
-        log({ 'req.params': req.params });
-        const id = Number(par.value); //Number(req.params.id); // blog ID
-        // log(typeof id);
-        const patient = patients.find(patient => patient.id === id);
-
+    async getPatient(client) {
+        log({ 'client': client.par.name });
+        let patient = {};
+        if (client.par.value) {
+            const id = Number(client.par.value); //Number(req.params.id); // blog ID
+            patient = patients.find(patient => patient.id === id);
+        }
         log({ patient });
-
-        // log({ req });
-        // log({ par });
-        // log(par.value);
-
-        const dto = DTOFactory({
-            stream: JSON.stringify(patient)
-        });
-
+        const dto = DTOFactory({ stream: JSON.stringify(patient) });
         return dto;
-
-        // return patient;
     }
-    async addPatient(req, reply) {
+    async addPatient() {
         const id = patients.length + 1; // generate new ID
         // return { foo: 'bar' };
         console.log({ id });
@@ -88,7 +76,6 @@ class patientControllers {
         };
         // console.log({ newPatient });
         patients.push(newPatient);
-
         return newPatient;
     }
     async updatePatient(req, reply) {
@@ -168,6 +155,9 @@ const createReadStream = (file, url) => {
 }
 
 const serve = (url) => {
+
+
+
     const filePath = path.join(STATIC_PATH, url);
     return Promise.resolve()
         .then(() => {
@@ -182,8 +172,8 @@ const serve = (url) => {
 };
 
 const staticController = {
-    staticContent: async (par) => {
-        return DTOFactory({ stream: serve(par.name) });
+    staticContent: async (client) => {
+        return DTOFactory({ stream: serve(client.url) });
     }
 };
 
