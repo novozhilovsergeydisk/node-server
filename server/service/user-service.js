@@ -18,7 +18,7 @@ class UserService {
     constructor() {}
 
     cabinet(client) {
-        log({ 'client.url': client.url });
+        // log({ 'client.url': client.url });
 
         // const parName = client.par.name;
         //

@@ -1,6 +1,7 @@
 'use strict'
 
-const { http, path, log, end, Route, Client } = require('./bootstrap.js');
+const { http, path, logger, log, end, Route, Client } = require('./bootstrap.js');
+
 // const { Auth } = require('./lib/auth.js');
 const MIME_TYPES = {
     html: 'text/html; charset=UTF-8',
@@ -79,13 +80,21 @@ class Server {
 
     strategyVariant(client, content, res) {
 
-        // log({ content });
+        log({ content });
+
+        if ( content instanceof Promise ) {
+            content.then(data => {
+                log({ data });
+            });
+        }
 
         // content.then(data => {
         //     log({ data });
         // })
 
         if (client.mimeType === 'text/html; charset=UTF-8') {
+
+
             if (content === null || content === undefined) {
                 __404(client, res);
             } else {
@@ -98,7 +107,7 @@ class Server {
                 } else {
                     const html = ((typeof content) ==='string' ) ? content : content.toString();
 
-                    log({ 'client.url': client.url });
+                    // log({ 'client.url': client.url });
 
                     send(client.mimeType, html, res);
                 }
@@ -152,6 +161,8 @@ class Server {
         });
 
         server.on('request', function(req, res) {
+            // logger.run(req, res);
+
             // const client = { req, res };
             // console.log('On server request url: ' + req.url);
             // this.statics(client);

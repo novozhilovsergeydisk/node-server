@@ -52,7 +52,7 @@ class patientControllers {
     async getAllPatients() {
         const dto = DTOFactory({ stream: nunjucks.render('index.html', patients) });
         // const dto = DTOFactory({ stream: { 'VIEWS_PATH': VIEWS_PATH } });
-        log({ dto });
+        // log({ dto });
         return dto;
     }
     async getPatient(client) {

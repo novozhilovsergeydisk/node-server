@@ -7,6 +7,7 @@ const { DTOFactory, capitalizeFirstLetter, log } = require(SERVER_PATH + '/helpe
 const { controller } = require(SERVER_PATH + '/controllers/Controller.js');
 const { patientController, staticController } = require('../controllers/patients.js');
 const cabinetControllers = require('../controllers/cabinet.js');
+const reportsControllers = require('../controllers/reports.js');
 const { Auth } = require(SERVER_PATH + '/lib/auth.js');
 
 // const user = { patient: 'Новожилов Сергей', age: 57 };
@@ -40,7 +41,9 @@ class Route {
                 '/js/*': staticController.staticContent,
                 '/images/*': staticController.staticContent,
                 '/register': patientController.register,
-                '/favicon.ico': staticController.staticContent
+                '/favicon.ico': staticController.staticContent,
+                '/reports/clinic': reportsControllers.clinic,
+                '/reports/clinic/*': reportsControllers.clinicById
             },
             'POST': {
                 '/register': (client, par) => handler(client, 'main', 'registration', par, {roles: ['admin']}),

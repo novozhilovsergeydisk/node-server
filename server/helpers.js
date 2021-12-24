@@ -67,6 +67,7 @@ const getFunctionBody = fn => {
     const indentedBody = restoreIndent(rawBody);
     const trimmedBody = indentedBody.replace(/^\s+|\s+$/g, "");
 
+
     return trimmedBody;
 };
 
@@ -74,7 +75,7 @@ const getFunctionBody = fn => {
  * DTO Factory function.
  * @param props
  */
-const DTOFactory = ((props) => {
+const DTOFactory = (props => {
     // log({ props });
 
     if (!props) {
@@ -92,22 +93,5 @@ const DTOFactory = ((props) => {
 
     return ret;
 });
-
-const promice = (data) => {
-    return new Promise((resolve, reject) => {
-        try {
-
-            // log({ data });
-            // log(typeof data);
-            // log({ par });
-            const renderer = serializeTypes[typeof data];
-            log({ renderer });
-
-            resolve(renderer);
-        } catch(e) {
-            reject(e);
-        }
-    });
-}
 
 module.exports = { capitalizeFirstLetter, DTOFactory, log, start, end, getFunctionParams, getFunctionBody };
