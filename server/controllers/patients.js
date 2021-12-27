@@ -4,6 +4,7 @@ const { DTOFactory, log } = require('../helpers.js');
 const { VIEWS_PATH, STATIC_PATH } = require('../../constants.js');
 const nunjucks = require('nunjucks');
 const userService = require('../service/user-service.js');
+const { parse } = require('querystring');
 
 // const userService = new UserService();
 
@@ -38,11 +39,19 @@ class patientControllers {
     async activate() {
         return DTOFactory({ stream: 'activate' });
     }
-    async register() {
+    async register(client) {
         try {
-            // const userService = new UserService();
-            //
-            // log({ userService });
+            log({ client });
+            log(typeof client.body);
+
+            const json = JSON.parse(client.body);
+
+            log(json.email);
+
+            // const { req, res } = client;
+
+
+            // userService.register();
 
             return DTOFactory({ stream: nunjucks.render('register/index.html', patients) });
         } catch(e) {

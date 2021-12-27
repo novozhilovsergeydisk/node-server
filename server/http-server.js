@@ -16,13 +16,7 @@ const MIME_TYPES = {
     otf: 'application/x-font-ttf'
 };
 
-// const auth = new Auth();
-
-// const route = new Route();
-
-// log({ Route });
-
-console.table([{doctor: 'Новожилов С.Ю.'}, {patient: 'Иванов Т.Ф.', sys: 143, dia: 89, pulse: 54, glukose: 5.9}, {patient: 'Петров А.М.', sys: 133, dia: 79, pulse: 64}, {patient: 'Сидоров А.М.', sys: 123, dia: 69, pulse: 74}]);
+console.table([{doctor: 'Новожилов С.Ю.'}, {patient: 'Тихонова Галина Федотовна', sys: 143, dia: 89, pulse: 54, glukose: 5.9}, {patient: 'Багдасарян Анна Рафаэловна', sys: 133, dia: 79, pulse: 64}, {patient: 'Каргальская Ирина Геннадьевна', sys: 123, dia: 69, pulse: 74}]);
 
 const resolve = data => {
     return new Promise(resolve => {
@@ -63,15 +57,15 @@ class Server {
 
                 return resolve;
             })
-            .then(data => {
-                // user.fullName = 'Новожилов Сергей';
-                // const isAuth = auth.login();
-                // log({ isAuth });
-
-                // log({ data });
-
-                return data;
-            })
+            // .then(dat => {
+            //     // user.fullName = 'Новожилов Сергей';
+            //     // const isAuth = auth.login();
+            //     // log({ isAuth });
+            //
+            //     log({ dat });
+            //
+            //     return dat;
+            // })
             .catch(err => {
                 console.log({ 'Error execute()': err });
                 return null;
@@ -79,22 +73,7 @@ class Server {
     };
 
     strategyVariant(client, content, res) {
-
-        log({ content });
-
-        if ( content instanceof Promise ) {
-            content.then(data => {
-                log({ data });
-            });
-        }
-
-        // content.then(data => {
-        //     log({ data });
-        // })
-
         if (client.mimeType === 'text/html; charset=UTF-8') {
-
-
             if (content === null || content === undefined) {
                 __404(client, res);
             } else {
@@ -102,7 +81,7 @@ class Server {
                     content.then(data => {
                         // log({ data });
 
-                        if (data === null) __404(client, res);
+                         (data === null) ? __404(client, res) : send(client.mimeType, data, res);
                     });
                 } else {
                     const html = ((typeof content) ==='string' ) ? content : content.toString();
@@ -139,8 +118,20 @@ class Server {
             const mimeType = MIME_TYPES[fileExt] || MIME_TYPES.html;
             const client = new Client(req.headers.host, req.method, url, fileExt, mimeType);
 
-            // log({ url });
-            // log({ client });
+            if (req.method === 'POST') {
+                let body = '';
+                req.on('data', chunk => {
+                    body += chunk.toString(); // convert Buffer to string
+                    client.body = body;
+                    console.log(body);
+                });
+                // req.on('end', () => {
+                //     console.log(body);
+                //     res.end('ok');
+                // });
+            }
+
+
             // end();
 
             try {

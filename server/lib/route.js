@@ -40,13 +40,13 @@ class Route {
                 '/css/*': staticController.staticContent,
                 '/js/*': staticController.staticContent,
                 '/images/*': staticController.staticContent,
-                '/register': patientController.register,
+                '/api/register': patientController.register,
                 '/favicon.ico': staticController.staticContent,
                 '/reports/clinic': reportsControllers.clinic,
                 '/reports/clinic/*': reportsControllers.clinicById
             },
             'POST': {
-                '/register': (client, par) => handler(client, 'main', 'registration', par, {roles: ['admin']}),
+                '/api/register': patientController.register,
                 '/login': (client, par) => handler(client, 'main', 'login', par, {roles: ['admin']}),
                 '/logut': (client, par) => handler(client, 'main', 'logout', par, {roles: ['admin']})
             }

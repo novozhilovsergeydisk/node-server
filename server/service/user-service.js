@@ -46,7 +46,7 @@ class UserService {
         // return cabinetList;
     }
 
-    registration(email, password) {
+    async register(email, password) {
         const candidate = new Promise((resolve) => {
             const sql = 'users u';
             pg
@@ -59,6 +59,14 @@ class UserService {
                     resolve(data);
                 });
         });
+
+        if (candidate) {
+            throw new Error('пользователь с таким email ужк существует')
+        }
+
+        const hashPassword = await bcrypt.hash(password, 3);
+        const activationLink = uuid.v4();
+        const user = await model.create({ email, password: hashPassword, activationLink });
 
         return candidate;
         // model.query(sql, values).then(data => log({ 'data 1': data }));
