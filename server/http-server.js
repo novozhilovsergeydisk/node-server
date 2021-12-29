@@ -2,6 +2,35 @@
 
 const { http, path, logger, log, end, Route, Client } = require('./bootstrap.js');
 
+var faker = require('faker');
+
+const randomName = faker.name.findName(); // Rowan Nikolaus
+const randomEmail = faker.internet.email(); // Kassandra.Haley@erich.biz
+const randomCard = faker.helpers.createCard(); // random contact card containing many properties
+const randomImage = faker.image.fashion();
+
+log({ randomName, randomEmail, randomImage });
+
+// var http = require('http');
+const url = require('url');
+const fs = require('fs');
+//
+http.createServer(function (req, res) {
+    const q = url.parse(req.url, true);
+    const filename = "../src" + q.pathname;log({ __dirname });
+
+    log({ filename });
+    fs.readFile(filename, function(err, data) {
+        if (err) {
+            res.writeHead(404, {'Content-Type': 'text/html'});
+            return res.end("404 Not Found");
+        }
+        res.writeHead(200, {'Content-Type': 'text/html'});
+        res.write(data);
+        return res.end();
+    });
+}).listen(8080);
+
 // const { Auth } = require('./lib/auth.js');
 const MIME_TYPES = {
     html: 'text/html; charset=UTF-8',
