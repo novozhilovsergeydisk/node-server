@@ -30,23 +30,30 @@ let patients = [
 
 // Handlers
 class patientControllers {
+    async test() {
+        return DTOFactory({ stream: nunjucks.render('test/index.html', { patients: patients }) });
+    }
+
     async main() {
         return DTOFactory({ stream: 'main' });
     }
+
     async refresh() {
         return DTOFactory({ stream: 'refresh' });
     }
+
     async activate() {
         return DTOFactory({ stream: 'activate' });
     }
+
     async register(client) {
         try {
-            log({ client });
-            log(typeof client.body);
+            // log({ client });
+            // log(typeof client.body);
 
             const json = JSON.parse(client.body);
 
-            log(json.email);
+            // log(json.email);
 
             // const { req, res } = client;
 
@@ -58,23 +65,26 @@ class patientControllers {
 
         }
     }
+
     async getAllPatients() {
         const dto = DTOFactory({ stream: nunjucks.render('index.html', patients) });
         // const dto = DTOFactory({ stream: { 'VIEWS_PATH': VIEWS_PATH } });
         // log({ dto });
         return dto;
     }
+
     async getPatient(client) {
-        log({ 'client': client.par.name });
+        // log({ 'client': client.par.name });
         let patient = {};
         if (client.par.value) {
             const id = Number(client.par.value); //Number(req.params.id); // blog ID
             patient = patients.find(patient => patient.id === id);
         }
-        log({ patient });
+        // log({ patient });
         const dto = DTOFactory({ stream: JSON.stringify(patient) });
         return dto;
     }
+
     async addPatient() {
         const id = patients.length + 1; // generate new ID
         // return { foo: 'bar' };
@@ -87,6 +97,7 @@ class patientControllers {
         patients.push(newPatient);
         return newPatient;
     }
+
     async updatePatient(req, reply) {
         const id = Number(req.params.id)
         patients = patients.map(patient => {
@@ -102,6 +113,7 @@ class patientControllers {
             fio: req.body.fio
         };
     }
+
     async deletePatient(req, reply) {
         const id = Number(req.params.id);
         patients = patients.filter(patient => patient.id !== id);
@@ -123,20 +135,11 @@ const existFile = (file) => {
     return filePromice.then(stats => {
         return new Promise(resolve => {
             stats._file = file;
-
-            const dto = DTOFactory({
-                status: 'success',
-                data: { 'file': file },
-            });
-
-            // log({ dto });
-            // resolve(dto);
-
             resolve({ info: 'file ' + file, status: 'success', error: '' });
         });
     }).catch(err => {
         return new Promise(reject => {
-            reject({ state: 'read file', info: 'file ' + file, status: 'failed', error: err });
+            reject({ info: 'file ' + file, status: 'failed', error: err });
         });
     });
 };

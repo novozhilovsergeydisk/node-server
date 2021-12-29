@@ -32,7 +32,7 @@ class reportsControllers {
         ];
 
         const stream = data.then(clinics => {
-           log({ clinics });
+           // log({ clinics });
 
            const patients = [{ title: "Иванов", id: 1 }, { title: "Козлов", id: 2}, { title: "Гришин", id: 3}];
 

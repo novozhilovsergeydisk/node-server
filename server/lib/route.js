@@ -33,6 +33,7 @@ class Route {
                 '/': patientController.main,
                 '/index': patientController.getAllPatients,
                 '/index/*': patientController.getAllPatients,
+                '/test': patientController.test,
                 '/patient/id/*': patientController.getPatient,
                 '/api/activate/*': auth.activate,
                 '/api/refresh': auth.refresh,

@@ -54,7 +54,7 @@ class UserService {
                 .where({'email': email})
                 .fields(['u.id, u.email'])
                 .then(data => {
-                    log({ data });
+                    // log({ data });
 
                     resolve(data);
                 });
@@ -67,7 +67,7 @@ class UserService {
         const hashPassword = await bcrypt.hash(password, 3);
         const activationLink = uuid.v4();
         const user = await model.create({ email, password: hashPassword, activationLink });
-
+        await mailService.sendActivationMail(email, activationLink);
         return candidate;
         // model.query(sql, values).then(data => log({ 'data 1': data }));
         // model.query('SELECT NOW() as now').then(data => log({ 'data 2': data }));

@@ -16,7 +16,23 @@ const MIME_TYPES = {
     otf: 'application/x-font-ttf'
 };
 
-console.table([{doctor: 'Новожилов С.Ю.'}, {patient: 'Тихонова Галина Федотовна', sys: 143, dia: 89, pulse: 54, glukose: 5.9}, {patient: 'Багдасарян Анна Рафаэловна', sys: 133, dia: 79, pulse: 64}, {patient: 'Каргальская Ирина Геннадьевна', sys: 123, dia: 69, pulse: 74}]);
+// http://espressocode.top/http-headers-content-type/
+// https://nodejsdev.ru/doc/email/
+
+const CONTENT_TYPES = {
+    MILTIPART_FORMDATA: 'multipart/form-data',
+    MILTIPART_URLENCODED: 'application/x-www-form-urlencoded',
+    APPLICATION_JSON: 'application/json'
+}
+
+// log(MIME_TYPES.html);
+
+console.table([
+    {doctor: 'Новожилов С.Ю.'},
+    {patient: 'Тихонова Галина Федотовна', sys: 143, dia: 89, pulse: 54, glukose: 5.9},
+    {patient: 'Багдасарян Анна Рафаэловна', sys: 133, dia: 79, pulse: 64},
+    {patient: 'Каргальская Ирина Геннадьевна', sys: 123, dia: 69, pulse: 74}
+]);
 
 const resolve = data => {
     return new Promise(resolve => {
@@ -48,6 +64,18 @@ const send = ((mimeType, html, res) => {
 
 class Server {
     constructor() {};
+
+    make(client, res) {
+        try {
+            this.execute(client).then(data => {
+                // log({ data });
+                this.answerStrategy(client, data.stream, res);
+            });
+        } catch(err) {
+            log({ 'Error while execute()': err });
+        }
+    }
+
     execute(client) {
         return Promise.resolve()
             .then(() => {
@@ -57,6 +85,8 @@ class Server {
 
                 return resolve;
             })
+            // Здесь можно проверить аутентификацию, авторизацию пользователя
+            //
             // .then(dat => {
             //     // user.fullName = 'Новожилов Сергей';
             //     // const isAuth = auth.login();
@@ -70,29 +100,27 @@ class Server {
                 console.log({ 'Error execute()': err });
                 return null;
             });
-    };
+    }
 
-    strategyVariant(client, content, res) {
-        if (client.mimeType === 'text/html; charset=UTF-8') {
+    answerStrategy(client, content, res) {
+        const isPromice = content instanceof Promise;
+        const isObject = typeof content === 'object';
+        // log({ content });
+        if (client.mimeType === MIME_TYPES.html) {
             if (content === null || content === undefined) {
                 __404(client, res);
             } else {
-                if (content instanceof Promise) {
+                if (isPromice) {
                     content.then(data => {
-                        // log({ data });
-
                          (data === null) ? __404(client, res) : send(client.mimeType, data, res);
                     });
                 } else {
                     const html = ((typeof content) ==='string' ) ? content : content.toString();
-
-                    // log({ 'client.url': client.url });
-
                     send(client.mimeType, html, res);
                 }
             }
         } else {
-            if (typeof content === 'object') {
+            if (isPromice) {
                 content
                     .then(stream => {
                         res.setHeader('Content-Type', client.mimeType);
@@ -118,34 +146,67 @@ class Server {
             const mimeType = MIME_TYPES[fileExt] || MIME_TYPES.html;
             const client = new Client(req.headers.host, req.method, url, fileExt, mimeType);
 
+            log({ 'req.headers[content-type]': req.headers['content-type'], url });
+
             if (req.method === 'POST') {
+                // log({ 'req.body': req.body });
+
                 let body = '';
+
                 req.on('data', chunk => {
-                    body += chunk.toString(); // convert Buffer to string
+                    const contentType = req.headers["content-type"];
+
+                    log({ contentType });
+
+                    if (contentType === CONTENT_TYPES.MILTIPART_FORMDATA) {
+                        log({ chunk });
+                        body += chunk.toString(); // convert Buffer to string
+                        client.body = body;
+                    }
+
+                    if (contentType === CONTENT_TYPES.MILTIPART_URLENCODED) {
+                        log({ chunk });
+
+                        body += chunk.toString(); // convert Buffer to string
+                    }
+
+                    const bodyArr = body.split('&');
+
+                    const jsonString = JSON.stringify(Object.assign({}, bodyArr))
+
+                    log({ jsonString });
+
                     client.body = body;
-                    console.log(body);
+
+                    if (contentType === CONTENT_TYPES.APPLICATION_JSON) {
+                        log({ chunk });
+                        body += chunk.toString(); // convert Buffer to string
+                        client.body = body;
+                    }
+
+                    log({ body });
+
+                    this.make(client, res);
+                    // console.log(body);
                 });
-                // req.on('end', () => {
-                //     console.log(body);
-                //     res.end('ok');
-                // });
             }
 
-
-            // end();
-
-            try {
-                this.execute(client).then(data => {
-                    // log({ 'url': url, 'mime': client.mimeType });
-
-                    // log({ data });
-
-                    // const content = data.stream;
-                    this.strategyVariant(client, data.stream, res);
-                });
-            } catch(err) {
-                log({ 'Error while execute()': err });
+            if (req.method === 'GET') {
+                this.make(client, res);
             }
+
+            // try {
+            //     this.execute(client).then(data => {
+            //         // log({ 'url': url, 'mime': client.mimeType });
+            //
+            //         // log({ data });
+            //
+            //         // const content = data.stream;
+            //         this.answerStrategy(client, data.stream, res);
+            //     });
+            // } catch(err) {
+            //     log({ 'Error while execute()': err });
+            // }
             req.on('end', function() {
                 // console.log('end');
             });
