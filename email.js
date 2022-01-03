@@ -11,18 +11,18 @@ const nodemailer = require('nodemailer');
 // });
 
 var transporter = nodemailer.createTransport({
-  host: 'smtp.mail.ru',
+  host: '.ru',
   port: 465,
   secure: true,
   auth: {
-    user: 'sergionov@mail.ru',
-    pass: 'NYN04szNwP8JsMbgjZ4N'
+    user: '@mail.ru',
+    pass: ''
   }
 });
 
 const mailOptions = {
-  from: 'sergionov@mail.ru',
-  to: 'sergionov@mail.ru',
+  from: '.ru',
+  to: '@mail.ru',
   subject: 'Sending Email using Node.js',
   text: 'That was easy!'
 };
